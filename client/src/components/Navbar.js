@@ -94,7 +94,7 @@ const Navbar = () => {
             <Typography 
               variant="h6" 
               sx={{ 
-                color: 'primary.contrastText'
+                color: theme.palette.accent.main
               }}
             >
               My App
@@ -104,14 +104,14 @@ const Navbar = () => {
           {!isMobile && (
             <IconButton 
               onClick={toggleDrawer}
-              sx={{ color: 'primary.contrastText' }}
+              sx={{ color: theme.palette.secondary.main }}
             >
               {open ? <MenuOpenIcon /> : <MenuIcon />}
             </IconButton>
           )}
         </Box>
         
-        <Divider sx={{ bgcolor: 'primary.light', opacity: 0.2, mx: 1 }} />
+        <Divider sx={{ bgcolor: theme.palette.secondary.main, opacity: 0.3, mx: 1 }} />
         
         {/* Navigation Links */}
         <List sx={{ flexGrow: 1, pt: 2, px: 1 }}>
@@ -143,7 +143,7 @@ const Navbar = () => {
               >
                 <ListItemIcon sx={{ 
                   color: location.pathname === item.path 
-                    ? theme.palette.secondary.main 
+                    ? theme.palette.accent.main
                     : theme.palette.primary.contrastText, 
                   minWidth: open ? 40 : 24,
                   mr: open ? 2 : 'auto',
@@ -160,7 +160,7 @@ const Navbar = () => {
         {/* Footer */}
         {open && !isMobile && (
           <Box sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            <Typography variant="caption" sx={{ color: theme.palette.secondary.main }}>
               &copy; {new Date().getFullYear()} My App
             </Typography>
           </Box>

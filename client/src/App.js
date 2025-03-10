@@ -9,27 +9,38 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import About from './pages/About';
 
-// Create a custom theme
+// Create a custom theme with the Coolors color palette
+// F1DEDE - Light pink (background)
+// D496A7 - Mauve pink (secondary)
+// 5D576B - Dark purple (primary dark)
+// 6CD4FF - Bright blue (primary)
+// FE938C - Salmon (accent)
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#0d47a1',
+      main: '#6CD4FF', // Bright blue
+      light: '#92E0FF', // Lighter blue
+      dark: '#5D576B', // Dark purple
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#f50057',
+      main: '#D496A7', // Mauve pink
+      light: '#E6B9C6',
+      dark: '#B47487',
       contrastText: '#ffffff',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#ffffff', // Changed from light pink to white
       paper: '#ffffff',
     },
     text: {
-      primary: '#212121',
-      secondary: '#757575',
-    }
+      primary: '#5D576B', // Dark purple
+      secondary: '#7A7488', // Lighter purple
+    },
+    accent: {
+      main: '#FE938C', // Salmon
+      contrastText: '#ffffff',
+    },
   },
   typography: {
     fontFamily: '"Roboto", "Segoe UI", Arial, sans-serif',
@@ -37,17 +48,17 @@ const theme = createTheme({
       fontSize: '2.5rem',
       fontWeight: 500,
       marginBottom: '1rem',
-      color: '#1976d2',
+      color: '#5D576B', // Dark purple
     },
     h2: {
       fontSize: '2rem',
       fontWeight: 500,
       marginBottom: '1rem',
-      color: '#1976d2',
+      color: '#6CD4FF', // Bright blue
     },
     body1: {
       fontSize: '1rem',
-      color: '#212121',
+      color: '#5D576B', // Dark purple
     },
   },
   components: {
@@ -71,6 +82,25 @@ const theme = createTheme({
       styleOverrides: {
         paper: {
           boxShadow: '0 3px 10px rgba(0, 0, 0, 0.2)',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+        containedPrimary: {
+          backgroundColor: '#6CD4FF', // Bright blue
+          '&:hover': {
+            backgroundColor: '#5D576B', // Dark purple on hover
+          },
+        },
+        containedSecondary: {
+          backgroundColor: '#D496A7', // Mauve pink
+          '&:hover': {
+            backgroundColor: '#FE938C', // Salmon on hover
+          },
         },
       },
     },
