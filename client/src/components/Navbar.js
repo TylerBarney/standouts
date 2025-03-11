@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import {
   Home as HomeIcon,
-  Info as InfoIcon,
   MenuOpen as MenuOpenIcon,
   Menu as MenuIcon,
   Work as WorkIcon,
@@ -42,7 +41,6 @@ const Navbar = () => {
   // List of navigation items
   const navItems = [
     { text: "Dashboard", path: "/", icon: <HomeIcon /> },
-    { text: "About", path: "/about", icon: <InfoIcon /> },
     { text: "Jobs", path: "/jobs", icon: <WorkIcon /> },
     { text: "Applicants", path: "/applicants", icon: <ApplicantsIcon /> },
     // Add more navigation items as needed

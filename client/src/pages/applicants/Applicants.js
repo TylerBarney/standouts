@@ -23,7 +23,11 @@ import {
 
 const Applicants = () => {
   const location = useLocation();
-  const job = location.state?.job;
+
+  const [job, setJob] = React.useState(location.state?.job || undefined);
+
+  console.log("Job", job);
+
   const [applicants, setApplicants] = React.useState([
     {
       jobID: "1",
@@ -88,14 +92,24 @@ const Applicants = () => {
     console.log("Navigate to jobs");
   };
 
+  const setJobToUndefined = () => {
+    setJob(undefined);
+  };
+
   return (
     <Container>
       <Box my={4}>
         <Typography variant="h1" gutterBottom color="primary.main">
-          <Button color="primary" onClick={() => navigateToJobs()}>
-            <KeyboardBackspaceIcon />
-          </Button>
-          Job {job.id}: {job.title}
+          {job === undefined ? (
+            "All Applicants"
+          ) : (
+            <>
+              <Button color="primary" onClick={() => setJobToUndefined()}>
+                <KeyboardBackspaceIcon />
+              </Button>
+              Job {job.id}: {job.title}
+            </>
+          )}
           <Button color="primary" onClick={() => navigateToJobs()}>
             <WorkOutlineIcon />
           </Button>
@@ -133,37 +147,40 @@ const Applicants = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {applicants.map((applicant, index) =>
-                  applicant.jobID === String(job.id) ? (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <Button
-                          color="primary"
-                          onClick={() => viewApplicant(index)}
-                        >
-                          <AddIcon />
-                        </Button>
-                      </TableCell>
-                      <TableCell>{applicant.jobID}</TableCell>
-                      <TableCell>{applicant.similarity * 100}%</TableCell>
-                      <TableCell>{applicant.name}</TableCell>
-                      <TableCell>{applicant.email}</TableCell>
-                      <TableCell>
-                        <Button>
-                          <DownloadIcon />
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          color="secondary"
-                          onClick={() => deleteApplicant(index)}
-                        >
-                          <RemoveIcon />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ) : null
-                )}
+                {applicants.map((applicant, index) => {
+                  if (job === undefined || applicant.jobID === String(job.id)) {
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Button
+                            color="primary"
+                            onClick={() => viewApplicant(index)}
+                          >
+                            <AddIcon />
+                          </Button>
+                        </TableCell>
+                        <TableCell>{applicant.jobID}</TableCell>
+                        <TableCell>{applicant.similarity * 100}%</TableCell>
+                        <TableCell>{applicant.name}</TableCell>
+                        <TableCell>{applicant.email}</TableCell>
+                        <TableCell>
+                          <Button>
+                            <DownloadIcon />
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            color="secondary"
+                            onClick={() => deleteApplicant(index)}
+                          >
+                            <RemoveIcon />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                  return null;
+                })}
               </TableBody>
             </Table>
           </TableContainer>

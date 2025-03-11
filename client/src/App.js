@@ -8,7 +8,6 @@ import Appbar from "./components/Appbar";
 
 // Pages
 import Dashboard from "./pages/dashboard/Dashboard";
-import About from "./pages/About";
 import Jobs from "./pages/jobs/Jobs";
 import Applicants from "./pages/applicants/Applicants";
 
@@ -109,7 +108,6 @@ function App() {
             <Appbar />
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/about" element={<About />} />
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/applicants" element={<Applicants />} />
               {/* Add more routes here */}
