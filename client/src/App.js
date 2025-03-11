@@ -1,53 +1,56 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 
 // Components
-import Navbar from './components/Navbar';
+import Navbar from "./components/Navbar";
+import Appbar from "./components/Appbar";
 
 // Pages
-import Home from './pages/Home';
-import About from './pages/About';
+import Dashboard from "./pages/dashboard/Dashboard";
+import About from "./pages/About";
+import Jobs from "./pages/jobs/Jobs";
+import Applicants from "./pages/applicants/Applicants";
 
 // Create a custom theme
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#0d47a1',
-      contrastText: '#ffffff',
+      main: "#1976d2",
+      light: "#42a5f5",
+      dark: "#0d47a1",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: '#f50057',
-      contrastText: '#ffffff',
+      main: "#f50057",
+      contrastText: "#ffffff",
     },
     background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
+      default: "#f5f5f5",
+      paper: "#ffffff",
     },
     text: {
-      primary: '#212121',
-      secondary: '#757575',
-    }
+      primary: "#212121",
+      secondary: "#757575",
+    },
   },
   typography: {
     fontFamily: '"Roboto", "Segoe UI", Arial, sans-serif',
     h1: {
-      fontSize: '2.5rem',
+      fontSize: "2.5rem",
       fontWeight: 500,
-      marginBottom: '1rem',
-      color: '#1976d2',
+      marginBottom: "1rem",
+      color: "#1976d2",
     },
     h2: {
-      fontSize: '2rem',
+      fontSize: "2rem",
       fontWeight: 500,
-      marginBottom: '1rem',
-      color: '#1976d2',
+      marginBottom: "1rem",
+      color: "#1976d2",
     },
     body1: {
-      fontSize: '1rem',
-      color: '#212121',
+      fontSize: "1rem",
+      color: "#212121",
     },
   },
   components: {
@@ -55,7 +58,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
         },
       },
     },
@@ -63,14 +66,14 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-          margin: '4px 8px',
+          margin: "4px 8px",
         },
       },
     },
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          boxShadow: '0 3px 10px rgba(0, 0, 0, 0.2)',
+          boxShadow: "0 3px 10px rgba(0, 0, 0, 0.2)",
         },
       },
     },
@@ -83,26 +86,32 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Box sx={{ 
-          display: 'flex', 
-          height: '100vh',
-          backgroundColor: 'background.default',
-          pt: 0.5 // Add a small top padding to the entire app
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            height: "100vh",
+            backgroundColor: "background.default",
+            pt: 0.5, // Add a small top padding to the entire app
+          }}
+        >
           <Navbar />
+
           <Box
             component="main"
             sx={{
               flexGrow: 1,
               p: { xs: 3, md: 4 },
               ml: 1, // Add some margin to create space between navbar and content
-              overflow: 'auto',
-              backgroundColor: 'background.default',
+              overflow: "auto",
+              backgroundColor: "background.default",
             }}
           >
+            <Appbar />
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Dashboard />} />
               <Route path="/about" element={<About />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/applicants" element={<Applicants />} />
               {/* Add more routes here */}
             </Routes>
           </Box>
