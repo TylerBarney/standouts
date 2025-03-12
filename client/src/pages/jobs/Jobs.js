@@ -167,7 +167,7 @@ const Jobs = () => {
                     <Typography variant="h6">Level</Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="h6">View Applicants</Typography>
+                    <Typography variant="h6">Applicants</Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="h6">Close</Typography>
