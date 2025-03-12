@@ -20,6 +20,7 @@ import {
   Menu as MenuIcon,
   Work as WorkIcon,
   PeopleAlt as ApplicantsIcon,
+  Badge as EmployeeIcon,
 } from "@mui/icons-material";
 
 const Navbar = () => {
@@ -43,6 +44,7 @@ const Navbar = () => {
     { text: "Dashboard", path: "/dashboard", icon: <HomeIcon /> },
     { text: "Jobs", path: "/jobs", icon: <WorkIcon /> },
     { text: "Applicants", path: "/applicants", icon: <ApplicantsIcon /> },
+    { text: "Employees", path: "/employees", icon: <EmployeeIcon /> },
     // Add more navigation items as needed
   ];
 
