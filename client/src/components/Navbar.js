@@ -40,7 +40,7 @@ const Navbar = () => {
 
   // List of navigation items
   const navItems = [
-    { text: "Dashboard", path: "/", icon: <HomeIcon /> },
+    { text: "Dashboard", path: "/dashboard", icon: <HomeIcon /> },
     { text: "Jobs", path: "/jobs", icon: <WorkIcon /> },
     { text: "Applicants", path: "/applicants", icon: <ApplicantsIcon /> },
     // Add more navigation items as needed

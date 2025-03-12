@@ -1,20 +1,31 @@
 import React from "react";
+import { useAuth } from "../pages/authentication/AuthContext";
+
+import { useNavigate } from "react-router-dom";
 import { AppBar, Toolbar, Button, Typography } from "@mui/material";
 import { Person as PersonIcon } from "@mui/icons-material";
 
 const Appbar = () => {
-  const userName = "John Doe";
+  const navigate = useNavigate();
+  const { companyName, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Welcome, {userName}
+          {companyName ? `Welcome, ${companyName}` : "Welcome"}
         </Typography>
         <Button color="inherit">
           <PersonIcon />
         </Button>
-        <Button color="inherit">Logout</Button>
+        <Button color="inherit" onClick={handleLogout}>
+          Logout
+        </Button>
       </Toolbar>
     </AppBar>
   );

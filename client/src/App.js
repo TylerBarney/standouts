@@ -1,15 +1,26 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 
 // Components
 import Navbar from "./components/Navbar";
 import Appbar from "./components/Appbar";
 
+// Authentication
+import Login from "./pages/authentication/Login";
+import Register from "./pages/authentication/Register";
+import ProtectedRoute from "./pages/authentication/ProtectedRoute";
+
 // Pages
 import Dashboard from "./pages/dashboard/Dashboard";
 import Jobs from "./pages/jobs/Jobs";
 import Applicants from "./pages/applicants/Applicants";
+import { AuthProvider, useAuth } from "./pages/authentication/AuthContext";
 
 // Create a custom theme
 const theme = createTheme({
@@ -80,42 +91,59 @@ const theme = createTheme({
   spacing: 8, // Base spacing unit (8px)
 });
 
-function App() {
+function AppContext() {
+  const { isAuthenticated } = useAuth();
+
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
+    <Router>
+      <Box
+        sx={{
+          display: "flex",
+          height: "100vh",
+          backgroundColor: "background.default",
+          pt: 0.5, // Add a small top padding to the entire app
+        }}
+      >
+        {isAuthenticated && <Navbar />}
+
         <Box
+          component="main"
           sx={{
-            display: "flex",
-            height: "100vh",
+            flexGrow: 1,
+            p: { xs: 3, md: 4 },
+            ml: 1, // Add some margin to create space between navbar and content
+            overflow: "auto",
             backgroundColor: "background.default",
-            pt: 0.5, // Add a small top padding to the entire app
           }}
         >
-          <Navbar />
+          {isAuthenticated && <Appbar />}
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              p: { xs: 3, md: 4 },
-              ml: 1, // Add some margin to create space between navbar and content
-              overflow: "auto",
-              backgroundColor: "background.default",
-            }}
-          >
-            <Appbar />
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/applicants" element={<Applicants />} />
               {/* Add more routes here */}
-            </Routes>
-          </Box>
+            </Route>
+          </Routes>
         </Box>
-      </Router>
-    </ThemeProvider>
+      </Box>
+    </Router>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppContext />
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
