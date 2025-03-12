@@ -16,6 +16,10 @@ import {
   Fade,
   Backdrop,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -25,6 +29,17 @@ import {
 } from "@mui/icons-material";
 
 const Employees = () => {
+  const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
+  const jobDepartments = [
+    "Engineering",
+    "Marketing",
+    "HR",
+    "Sales",
+    "Finance",
+    "BI",
+    "Internship",
+  ];
+
   const [resumes, setResumes] = React.useState([
     {
       resumeID: "1",
@@ -79,6 +94,8 @@ const Employees = () => {
 
   const [openModal, setOpenModal] = React.useState(false);
   const [files, setFiles] = React.useState([]);
+  const [selectedLevel, setSelectedLevel] = React.useState("");
+  const [selectedDepartment, setSelectedDepartment] = React.useState("");
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -101,8 +118,8 @@ const Employees = () => {
       // Simulated data (normally, this comes from the backend)
       const resume = {
         resumeID: resumes.length + index + 1,
-        department: "Engineering",
-        level: "Internship",
+        department: selectedDepartment,
+        level: selectedLevel,
         name: file.name.replace(".pdf", ""),
         resume: file.name,
       };
@@ -116,6 +133,17 @@ const Employees = () => {
 
     // Clear the files after upload
     setFiles([]);
+    // Clear selected level and department
+    setSelectedDepartment("");
+    setSelectedLevel("");
+  };
+
+  const handleDepartmentChange = (e) => {
+    setSelectedDepartment(e.target.value);
+  };
+
+  const handleLevelChange = (e) => {
+    setSelectedLevel(e.target.value);
   };
 
   const deleteResume = (index) => {
@@ -179,6 +207,42 @@ const Employees = () => {
               <Typography variant="h6" gutterBottom>
                 Upload Resumes
               </Typography>
+
+              <FormControl fullWidth margin="normal">
+                {/* Level Dropdown */}
+                <InputLabel id="level-select-label">Select Job ID</InputLabel>
+                <Select
+                  labelId="level-select-label"
+                  id="level-select"
+                  value={selectedLevel}
+                  label="Level"
+                  onChange={handleLevelChange}
+                >
+                  {jobLevels.map((level) => (
+                    <MenuItem key={level} value={level}>
+                      {level}
+                    </MenuItem>
+                  ))}
+                </Select>
+
+                {/* Department Dropdown */}
+                <InputLabel id="department-select-label">
+                  Select Job ID
+                </InputLabel>
+                <Select
+                  labelId="department-select-label"
+                  id="department-select"
+                  value={selectedDepartment}
+                  label="Department"
+                  onChange={handleDepartmentChange}
+                >
+                  {jobDepartments.map((department) => (
+                    <MenuItem key={department} value={department}>
+                      {department}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
               <TextField
                 fullWidth
