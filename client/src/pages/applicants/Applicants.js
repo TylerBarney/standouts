@@ -47,49 +47,42 @@ const Applicants = () => {
       compatibility: 0.8,
       name: "John Doe",
       email: "johndoe@gmail.com",
-      resume: "Resume.pdf",
     },
     {
       jobID: "2",
       compatibility: 0.7,
       name: "Jane Doe",
       email: "janey@yahoo.com",
-      resume: "Resume.pdf",
     },
     {
       jobID: "3",
       compatibility: 0.82,
       name: "Aubry Ran",
       email: "johndoe@gmail.com",
-      resume: "Resume.pdf",
     },
     {
       jobID: "1",
       compatibility: 0.56,
       name: "Tyler Eod",
       email: "janey@yahoo.com",
-      resume: "Resume.pdf",
     },
     {
       jobID: "3",
       compatibility: 0.78,
       name: "Chloe Doe",
       email: "janey@yahoo.com",
-      resume: "Resume.pdf",
     },
     {
       jobID: "5",
       compatibility: 0.12,
-      name: "Jacob ",
+      name: "Jacob",
       email: "johndoe@gmail.com",
-      resume: "Resume.pdf",
     },
     {
       jobID: "4",
       compatibility: 0.2,
       name: "Olive Doe",
       email: "janey@yahoo.com",
-      resume: "Resume.pdf",
     },
   ]);
 
@@ -135,6 +128,33 @@ const Applicants = () => {
 
   const setJobToUndefined = () => {
     setJob(undefined);
+  };
+
+  const downloadResume = (applicantName, jobID) => {
+    try {
+      // Replace space with underscore
+      const name = applicantName.replace(/ /g, "_");
+
+      // Simulated byte array (normally, this comes from the backend)
+      const fakeByteArray = new Uint8Array([72, 101, 108, 108, 111]); // "Hello" in bytes
+      const blob = new Blob([fakeByteArray], { type: "application/pdf" });
+
+      // Create a link to trigger download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `job${jobID}_${name}_Resume.pdf`; // Set download filename
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      // Cleanup the object URL
+      URL.revokeObjectURL(url);
+
+      console.log("Resume download triggered.");
+    } catch (error) {
+      console.error("Error downloading resume:", error);
+    }
   };
 
   return (
@@ -320,7 +340,9 @@ const Applicants = () => {
                           <TableCell>
                             <Button
                               color="primary"
-                              onClick={() => deleteApplicant(index)}
+                              onClick={() =>
+                                downloadResume(applicant.name, applicant.jobID)
+                              }
                             >
                               <DownloadIcon />
                             </Button>
