@@ -3,16 +3,11 @@ import {
   Typography,
   Paper,
   Box,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Container,
   Button,
   Grid,
   useTheme,
 } from "@mui/material";
-import { CheckCircle as CheckIcon } from "@mui/icons-material";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -21,113 +16,107 @@ const Dashboard = () => {
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 8 }}>
         <Typography variant="h1" gutterBottom color="primary.main">
-          Welcome to StandOut
-        <Typography variant="h1" gutterBottom color="primary.dark">
-          Welcome to My App
+          Welcome to <strong>StandOut</strong>
         </Typography>
         <Typography variant="body1" paragraph color="text.secondary">
-          We need to figure out what kinds of things would be here.
+          Get started...
         </Typography>
-        
-        {/* Feature Card */}
-        <Paper 
-          elevation={2} 
-          sx={{ 
-            mt: 5, 
-            p: 4, 
-            borderRadius: 2,
-            borderTop: `4px solid ${theme.palette.primary.main}` // Bright blue top border
-          }}
-        >
-          <Typography variant="h2" gutterBottom color="primary.main">
-            Random Paper Element
-          </Typography>
-          <List>
-            {[
-              "React frontend with routing",
-              "Material UI components and theming",
-              "Collapsible navigation menu",
-              "Node.js backend with Express",
-              "MongoDB database connection",
-            ].map((item, index) => (
-              <ListItem key={index} sx={{ py: 1 }}>
-                <ListItemIcon>
-                  <CheckIcon sx={{ color: theme.palette.accent.main }} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography variant="body1" color="text.primary">
-                      {item}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-          
-          <Grid container spacing={2} sx={{ mt: 3 }}>
-            <Grid item>
-              <Button variant="contained" color="primary">
-                Get Started
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button variant="contained" color="secondary">
-                Learn More
-              </Button>
-            </Grid>
-          </Grid>
-        </Paper>
-        
-        {/* Second Card */}
-        <Paper 
-          elevation={2} 
-          sx={{ 
-            mt: 4, 
-            p: 4, 
-            borderRadius: 2,
-            borderTop: `4px solid ${theme.palette.secondary.main}` // Mauve pink top border
-          }}
-        >
-          <Typography variant="h2" gutterBottom color="secondary.main">
-            Beautiful Color Palette
-          </Typography>
-          <Typography variant="body1" paragraph>
-            Our application uses a thoughtfully selected color palette from Coolors:
-          </Typography>
-          
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            {[
-              { name: 'Light Pink', hex: '#F1DEDE', desc: 'Background' },
-              { name: 'Mauve Pink', hex: '#D496A7', desc: 'Secondary elements' },
-              { name: 'Dark Purple', hex: '#5D576B', desc: 'Text and navbar' },
-              { name: 'Bright Blue', hex: '#6CD4FF', desc: 'Primary elements' },
-              { name: 'Salmon', hex: '#FE938C', desc: 'Accents and highlights' }
-            ].map((color, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <Box 
-                  sx={{ 
-                    bgcolor: color.hex, 
-                    height: 80, 
-                    borderRadius: 1,
-                    boxShadow: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    p: 1.5
-                  }}
-                >
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: color.hex === '#F1DEDE' ? '#5D576B' : 'white' }}>
-                    {color.name}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: color.hex === '#F1DEDE' ? '#5D576B' : 'white' }}>
-                    {color.hex} - {color.desc}
-                  </Typography>
-                </Box>
+
+        <Grid container spacing={2} sx={{ mt: 5 }}>
+          {/* Employee Resumes Paper */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              elevation={2}
+              sx={{
+                p: 4,
+                borderRadius: 2,
+                borderTop: `4px solid ${theme.palette.secondary.main}`, // Bright blue top border
+              }}
+            >
+              <Typography variant="h2" gutterBottom color="secondary.main">
+                Employee Resumes
+              </Typography>
+              <Typography variant="body1" paragraph color="text.secondary">
+                Information about what the employee resumes do/are
+              </Typography>
+              <Grid container spacing={2} sx={{ mt: 3 }}>
+                <Grid item>
+                  <Button variant="contained" color="primary">
+                    Get Started
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button variant="contained" color="secondary">
+                    Learn More
+                  </Button>
+                </Grid>
               </Grid>
-            ))}
+            </Paper>
           </Grid>
-        </Paper>
+
+          {/* Applicant Resumes */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              elevation={2}
+              sx={{
+                p: 4,
+                borderRadius: 2,
+                borderTop: `4px solid ${theme.palette.primary.main}`,
+              }}
+            >
+              <Typography variant="h2" gutterBottom color="primary.main">
+                Applicant Resumes
+              </Typography>
+              <Typography variant="body1" paragraph color="text.secondary">
+                Information about what the applicant resumes do/are and how the
+                compatilibites are scored.
+              </Typography>
+              <Grid container spacing={2} sx={{ mt: 3 }}>
+                <Grid item>
+                  <Button variant="contained" color="primary">
+                    Get Started
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button variant="contained" color="secondary">
+                    Learn more
+                  </Button>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
+
+          {/* Job Openings Paper */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              elevation={2}
+              sx={{
+                p: 4,
+                borderRadius: 2,
+                borderTop: `4px solid ${theme.palette.secondary.main}`, // Bright blue top border
+              }}
+            >
+              <Typography variant="h2" gutterBottom color="secondary.main">
+                Job Openings
+              </Typography>
+              <Typography variant="body1" paragraph color="text.secondary">
+                Information about how the job openings work
+              </Typography>
+              <Grid container spacing={2} sx={{ mt: 3 }}>
+                <Grid item>
+                  <Button variant="contained" color="primary">
+                    Get Started
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button variant="contained" color="secondary">
+                    Learn More
+                  </Button>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
+        </Grid>
       </Box>
     </Container>
   );
