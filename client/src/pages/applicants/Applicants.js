@@ -140,19 +140,6 @@ const Applicants = () => {
   return (
     <Container>
       <Box my={4}>
-        <Typography variant="h1" gutterBottom color="primary.main">
-          {job === undefined ? (
-            "All Applicants"
-          ) : (
-            <>
-              <Button color="primary" onClick={() => setJobToUndefined()}>
-                <KeyboardBackspaceIcon />
-              </Button>
-              Job {job.id}: {job.title}
-            </>
-          )}
-        </Typography>
-
         {/* Modal for file upload */}
         <Modal
           open={openModal}
@@ -262,7 +249,19 @@ const Applicants = () => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="h5">Applicants</Typography>
+            <Typography variant="h2" gutterBottom color="primary.main">
+              {job === undefined ? (
+                "All Applicants"
+              ) : (
+                <>
+                  <Button color="primary" onClick={() => setJobToUndefined()}>
+                    <KeyboardBackspaceIcon />
+                  </Button>
+                  Job {job.id}: {job.title}
+                </>
+              )}
+            </Typography>
+
             {/* Button to open file upload modal */}
             <Button
               color="primary"
