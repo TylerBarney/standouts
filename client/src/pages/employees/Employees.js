@@ -90,8 +90,26 @@ const Employees = () => {
     setFiles(files.filter((_, i) => i !== index));
   };
 
+  //Add a resume to the frontend setResumes hook
+  const addResume = (resume) => {
+    setResumes([...resumes, resume]);
+  };
+
   const handleUploadResumes = () => {
     // make the API call to upload the files to the database
+    files.forEach((file, index) => {
+      // Simulated data (normally, this comes from the backend)
+      const resume = {
+        resumeID: resumes.length + index + 1,
+        department: "Engineering",
+        level: "Internship",
+        name: file.name.replace(".pdf", ""),
+        resume: file.name,
+      };
+
+      // Add the resume to the frontend
+      addResume(resume);
+    });
 
     console.log("Uploading files...", files);
     setOpenModal(false); //Close modal after upload
