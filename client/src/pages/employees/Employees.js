@@ -1,5 +1,4 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
 import {
   Container,
   Paper,
@@ -12,23 +11,15 @@ import {
   TableRow,
   Button,
   Typography,
-  Collapse,
   IconButton,
   Modal,
   Fade,
   Backdrop,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
-  ExpandLess as ExpandLessIcon,
-  ExpandMore as ExpandMoreIcon,
   Download as DownloadIcon,
-  KeyboardBackspace as KeyboardBackspaceIcon,
   Add as AddIcon,
   Cancel as CancelIcon,
 } from "@mui/icons-material";
@@ -40,42 +31,49 @@ const Employees = () => {
       department: "Engineering",
       level: "Internship",
       name: "John Doe",
+      resume: "John_Doe_Resume.pdf",
     },
     {
       resumeID: "2",
       department: "Marketing",
       level: "Manager",
       name: "Jane Doe",
+      resume: "Jane_Doe_Resume.pdf",
     },
     {
       resumeID: "3",
       department: "HR",
       level: "Senior",
       name: "Aubry Ran",
+      resume: "Aubry_Ran_Resume.pdf",
     },
     {
       resumeID: "4",
       department: "Sales",
       level: "Junior",
       name: "Tyler Eod",
+      resume: "Tyler_Eod_Resume.pdf",
     },
     {
       resumeID: "5",
       department: "Finance",
       level: "Entry",
       name: "Chloe Doe",
+      resume: "Chloe_Doe_Resume.pdf",
     },
     {
       resumeID: "6",
       department: "BI",
       level: "Internship",
       name: "Jacob ",
+      resume: "Jacob_Resume.pdf",
     },
     {
       resumeID: "7",
       department: "Finance",
       level: "Manager",
       name: "Olive Doe",
+      resume: "Olive_Doe_Resume.pdf",
     },
   ]);
 
@@ -94,6 +92,7 @@ const Employees = () => {
 
   const handleUploadResumes = () => {
     // make the API call to upload the files to the database
+
     console.log("Uploading files...", files);
     setOpenModal(false); //Close modal after upload
 
@@ -105,8 +104,31 @@ const Employees = () => {
     setResumes(resumes.filter((_, i) => i !== index));
   };
 
-  const downloadResume = (index) => {
-    console.log("Downloading resume...");
+  const downloadResume = (employeeName) => {
+    try {
+      // Replace space with underscore
+      const name = employeeName.replace(/ /g, "_");
+
+      // Simulated byte array (normally, this comes from the backend)
+      const fakeByteArray = new Uint8Array([72, 101, 108, 108, 111]); // "Hello" in bytes
+      const blob = new Blob([fakeByteArray], { type: "application/pdf" });
+
+      // Create a link to trigger download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `employee_${name}_Resume.pdf`; // Set download filename
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      // Cleanup the object URL
+      URL.revokeObjectURL(url);
+
+      console.log("Resume download triggered.");
+    } catch (error) {
+      console.error("Error downloading resume:", error);
+    }
   };
 
   return (
@@ -252,7 +274,7 @@ const Employees = () => {
                     <TableCell>
                       <Button
                         color="primary"
-                        onClick={() => downloadResume(index)}
+                        onClick={() => downloadResume(resume.name)}
                       >
                         <DownloadIcon />
                       </Button>
