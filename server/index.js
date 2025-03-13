@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const { getMongoUri, mongoOptions } = require('./config/db');
+const logger = require('./utils/logger');
 
 // Load environment variables
 dotenv.config();
@@ -14,10 +16,17 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Get the MongoDB URI from our config
+const mongoUri = getMongoUri();
+
+// For debugging - show connection string with password masked
+const debugUri = mongoUri.replace(/:[^:@]*@/, ':****@');
+logger.info(`Attempting to connect to MongoDB: ${debugUri}`);
+
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/myapp')
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+mongoose.connect(mongoUri, mongoOptions)
+  .then(() => logger.info('MongoDB connected'))
+  .catch(err => logger.error('MongoDB connection error:', err));
 
 // Routes
 app.use('/api', require('./routes/api'));
@@ -29,5 +38,5 @@ app.get('/', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 }); 

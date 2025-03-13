@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Container,
@@ -22,6 +22,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import {
   WorkOutline as WorkOutlineIcon,
@@ -31,8 +33,10 @@ import {
   Download as DownloadIcon,
   KeyboardBackspace as KeyboardBackspaceIcon,
   Add as AddIcon,
+  Remove as RemoveIcon,
   Cancel as CancelIcon,
 } from "@mui/icons-material";
+import { getApplicants } from "../../services/api";
 
 const Applicants = () => {
   const location = useLocation();
@@ -40,51 +44,6 @@ const Applicants = () => {
 
   const [job, setJob] = React.useState(location.state?.job || undefined);
   const [expandedRows, setExpandedRows] = React.useState({});
-
-  const [applicants, setApplicants] = React.useState([
-    {
-      jobID: "1",
-      compatibility: 0.8,
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-    },
-    {
-      jobID: "2",
-      compatibility: 0.7,
-      name: "Jane Doe",
-      email: "janey@yahoo.com",
-    },
-    {
-      jobID: "3",
-      compatibility: 0.82,
-      name: "Aubry Ran",
-      email: "johndoe@gmail.com",
-    },
-    {
-      jobID: "1",
-      compatibility: 0.56,
-      name: "Tyler Eod",
-      email: "janey@yahoo.com",
-    },
-    {
-      jobID: "3",
-      compatibility: 0.78,
-      name: "Chloe Doe",
-      email: "janey@yahoo.com",
-    },
-    {
-      jobID: "5",
-      compatibility: 0.12,
-      name: "Jacob",
-      email: "johndoe@gmail.com",
-    },
-    {
-      jobID: "4",
-      compatibility: 0.2,
-      name: "Olive Doe",
-      email: "janey@yahoo.com",
-    },
-  ]);
 
   const [openModal, setOpenModal] = React.useState(false);
   const [files, setFiles] = React.useState([]);
@@ -131,8 +90,54 @@ const Applicants = () => {
   const handleJobChange = (e) => {
     setSelectedJob(e.target.value);
   };
+  
+  const [applicants, setApplicants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Temporary business ID - in a real app, this would come from auth context or similar
+  const businessId = "67d0daded458795a794012ec"; // This would typically be the logged-in business's ID
+
+  // Fetch applicants when component mounts
+  useEffect(() => {
+    const formatApplicants = (applicants) => {
+      return applicants.map((applicant) => {
+        return {
+          id: applicant._id,
+          job_opening_id: applicant.job_opening_id,
+          match_score: applicant.match_score,
+          name: applicant.name,
+          email: applicant.email,
+          resume_url: applicant.resume_url,
+        }
+      })
+    }
+    
+    const fetchApplicants = async () => {
+      try {
+        setLoading(true);
+        const data = await getApplicants(businessId);
+        const dataApplicants = formatApplicants(data)
+        console.log("Applicants", dataApplicants);
+        setApplicants(dataApplicants);
+        setError(null);
+        console.log("Applicants", dataApplicants);
+      } catch (err) {
+        console.error("Failed to fetch applicants:", err);
+        setError("Failed to load applicants. Please try again later.");
+        // Keep any existing applicants in state
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplicants();
+  }, [businessId, job]); // Re-fetch if businessId changes
+
+  console.log("Job", job);
 
   const deleteApplicant = (index) => {
+    // In a real app, you would call an API to delete the applicant
     setApplicants(applicants.filter((_, i) => i !== index));
   };
 
@@ -173,6 +178,17 @@ const Applicants = () => {
       console.error("Error downloading resume:", error);
     }
   };
+
+  // Render loading state
+  if (loading && applicants.length === 0) {
+    return (
+      <Container>
+        <Box my={4} display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -335,78 +351,48 @@ const Applicants = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {applicants.map((applicant, index) => {
-                  if (job === undefined || applicant.jobID === String(job.id)) {
-                    return (
-                      <React.Fragment key={index}>
-                        <TableRow>
-                          <TableCell>
-                            <IconButton onClick={() => viewApplicant(index)}>
-                              {expandedRows[index] ? (
-                                <ExpandLessIcon />
-                              ) : (
-                                <ExpandMoreIcon />
-                              )}
-                            </IconButton>
-                          </TableCell>
-                          <TableCell>{applicant.name}</TableCell>
-                          <TableCell>{applicant.jobID}</TableCell>
-                          <TableCell>
-                            {Math.floor(applicant.compatibility * 100)}%
-                          </TableCell>
+                {applicants.length === 0 && !loading ? (
+                  <TableRow>
+                    <TableCell colSpan={7} align="center">
+                      <Typography variant="body1">No applicants found</Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  applicants.map((applicant, index) => {
+                    if (job === undefined || applicant.job_opening_id === String(job.id)) {
+                      return (
+                        <TableRow key={index}>
                           <TableCell>
                             <Button
                               color="primary"
-                              onClick={() =>
-                                downloadResume(applicant.name, applicant.jobID)
-                              }
+                              onClick={() => viewApplicant(index)}
                             >
+                              <AddIcon />
+                            </Button>
+                          </TableCell>
+                          <TableCell>{applicant.job_opening_id}</TableCell>
+                          <TableCell>{(applicant.match_score || 0) * 100}%</TableCell>
+                          <TableCell>{applicant.name}</TableCell>
+                          <TableCell>{applicant.email}</TableCell>
+                          <TableCell>
+                            <Button>
                               <DownloadIcon />
                             </Button>
                           </TableCell>
-
                           <TableCell>
                             <Button
                               color="secondary"
                               onClick={() => deleteApplicant(index)}
                             >
-                              <DeleteIcon />
+                              <RemoveIcon />
                             </Button>
                           </TableCell>
                         </TableRow>
-
-                        {/* Expandable Row with More Details */}
-                        <TableRow>
-                          <TableCell
-                            colSpan={7}
-                            style={{ paddingBottom: 0, paddingTop: 0 }}
-                          >
-                            <Collapse
-                              in={expandedRows[index]}
-                              timeout="auto"
-                              unmountOnExit
-                            >
-                              <Box margin={2}>
-                                <Typography variant="body1">
-                                  <Box
-                                    display="flex"
-                                    justifyContent="space-between"
-                                    alignItems="center"
-                                  >
-                                    <Box>
-                                      <strong>Email:</strong> {applicant.email}
-                                    </Box>
-                                  </Box>
-                                </Typography>
-                              </Box>
-                            </Collapse>
-                          </TableCell>
-                        </TableRow>
-                      </React.Fragment>
-                    );
-                  }
-                  return null;
-                })}
+                      );
+                    }
+                    return null;
+                  })
+                )}
               </TableBody>
             </Table>
           </TableContainer>
