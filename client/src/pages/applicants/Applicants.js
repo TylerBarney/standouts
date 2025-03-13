@@ -104,7 +104,7 @@ const Applicants = () => {
       return applicants.map((applicant) => {
         return {
           id: applicant._id,
-          job_opening_id: applicant.job_opening_id,
+          jobID: applicant.job_opening_id,
           compatibility: applicant.match_score,
           name: applicant.name,
           email: applicant.email,
@@ -117,11 +117,10 @@ const Applicants = () => {
       try {
         setLoading(true);
         const data = await getApplicants(businessId);
-        const dataApplicants = formatApplicants(data)
+        const dataApplicants = formatApplicants(data);
         console.log("Applicants", dataApplicants);
         setApplicants(dataApplicants);
         setError(null);
-        console.log("Applicants", dataApplicants);
       } catch (err) {
         console.error("Failed to fetch applicants:", err);
         setError("Failed to load applicants. Please try again later.");
@@ -134,7 +133,6 @@ const Applicants = () => {
     fetchApplicants();
   }, [businessId, job]); // Re-fetch if businessId changes
 
-  console.log("Job", job);
 
   const deleteApplicant = (index) => {
     // In a real app, you would call an API to delete the applicant

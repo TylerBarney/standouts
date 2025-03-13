@@ -27,6 +27,7 @@ import {
   Add as AddIcon,
   Cancel as CancelIcon,
 } from "@mui/icons-material";
+import { getEmployees } from "../../services/api";
 
 const Employees = () => {
   const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
@@ -40,57 +41,42 @@ const Employees = () => {
     "Internship",
   ];
 
-  const [resumes, setResumes] = React.useState([
-    {
-      resumeID: "1",
-      department: "Engineering",
-      level: "Internship",
-      name: "John Doe",
-      resume: "John_Doe_Resume.pdf",
-    },
-    {
-      resumeID: "2",
-      department: "Marketing",
-      level: "Manager",
-      name: "Jane Doe",
-      resume: "Jane_Doe_Resume.pdf",
-    },
-    {
-      resumeID: "3",
-      department: "HR",
-      level: "Senior",
-      name: "Aubry Ran",
-      resume: "Aubry_Ran_Resume.pdf",
-    },
-    {
-      resumeID: "4",
-      department: "Sales",
-      level: "Junior",
-      name: "Tyler Eod",
-      resume: "Tyler_Eod_Resume.pdf",
-    },
-    {
-      resumeID: "5",
-      department: "Finance",
-      level: "Entry",
-      name: "Chloe Doe",
-      resume: "Chloe_Doe_Resume.pdf",
-    },
-    {
-      resumeID: "6",
-      department: "BI",
-      level: "Internship",
-      name: "Jacob ",
-      resume: "Jacob_Resume.pdf",
-    },
-    {
-      resumeID: "7",
-      department: "Finance",
-      level: "Manager",
-      name: "Olive Doe",
-      resume: "Olive_Doe_Resume.pdf",
-    },
-  ]);
+  const [employees, setEmployees] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  const businessId = "67d0daded458795a794012ec"; // This would typically be the logged-in business's ID
+
+  React.useEffect(() => {
+    const formatEmployees = (employees) => {
+      return employees.map((employee) => {
+        return {
+          id: employee._id,
+          name: employee.name,
+          department: employee.department,
+          level: employee.position_level,
+          resume: employee.resume,
+        };
+      });
+    };
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true);
+        const data = await getEmployees(businessId);
+        const dataEmployees = formatEmployees(data)
+        setEmployees(dataEmployees);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch employees:", err);
+        setError("Failed to load employees. Please try again later.");
+        // Keep any existing employees in state
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEmployees();
+  }, [businessId]);
+
 
   const [openModal, setOpenModal] = React.useState(false);
   const [files, setFiles] = React.useState([]);
@@ -108,8 +94,8 @@ const Employees = () => {
   };
 
   //Add a resume to the frontend setResumes hook
-  const addResume = (resume) => {
-    setResumes([...resumes, resume]);
+  const addEmployee = (employee) => {
+    setEmployees([...employees, employee]);
   };
 
   const handleUploadResumes = () => {
@@ -117,7 +103,7 @@ const Employees = () => {
     files.forEach((file, index) => {
       // Simulated data (normally, this comes from the backend)
       const resume = {
-        resumeID: resumes.length + index + 1,
+        resumeID: employees.length + index + 1,
         department: selectedDepartment,
         level: selectedLevel,
         name: file.name.replace(".pdf", ""),
@@ -125,7 +111,7 @@ const Employees = () => {
       };
 
       // Add the resume to the frontend
-      addResume(resume);
+      addEmployee(resume);
     });
 
     console.log("Uploading files...", files);
@@ -147,7 +133,7 @@ const Employees = () => {
   };
 
   const deleteResume = (index) => {
-    setResumes(resumes.filter((_, i) => i !== index));
+    setEmployees(employees.filter((_, i) => i !== index));
   };
 
   const downloadResume = (employeeName) => {
@@ -347,16 +333,23 @@ const Employees = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {resumes.map((resume, index) => (
+                {employees.length === 0 && !loading ? (
                   <TableRow>
-                    <TableCell>{resume.resumeID}</TableCell>
-                    <TableCell>{resume.name}</TableCell>
-                    <TableCell>{resume.department}</TableCell>
-                    <TableCell>{resume.level}</TableCell>
-                    <TableCell>
+                    <TableCell colSpan={7} align="center">
+                      <Typography variant="body1">No employees found</Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  employees.map((employee, index) => (
+                    <TableRow>
+                      <TableCell>{employee.id}</TableCell>
+                      <TableCell>{employee.name}</TableCell>
+                      <TableCell>{employee.department}</TableCell>
+                      <TableCell>{employee.level}</TableCell>
+                      <TableCell>
                       <Button
                         color="primary"
-                        onClick={() => downloadResume(resume.name)}
+                        onClick={() => downloadResume(employee.name)}
                       >
                         <DownloadIcon />
                       </Button>
@@ -371,7 +364,7 @@ const Employees = () => {
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))}
+                )))}
               </TableBody>
             </Table>
           </TableContainer>

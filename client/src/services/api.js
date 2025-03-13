@@ -81,22 +81,22 @@ export const addApplicant = async (applicantData) => {
   }
 };
 
-export const getResumes = async (businessId) => {
+export const getEmployees = async (businessId) => {
   try {
-    const response = await api.get(`/business/${businessId}/resumes`);
+    const response = await api.get(`/business/${businessId}/employees`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching resumes:', error);
+    console.error('Error fetching employees:', error);
     throw error;
   }
 };
 
-export const addResume = async (resumeData) => {
+export const addEmployee = async (employeeData) => {
   try {
-    const response = await api.post('/resumes', resumeData);
+    const response = await api.post('/employees', employeeData);
     return response.data;
   } catch (error) {
-    console.error('Error adding resume:', error);
+    console.error('Error adding employee:', error);
     throw error;
   }
 };

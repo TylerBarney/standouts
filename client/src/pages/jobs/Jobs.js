@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -21,7 +21,7 @@ import {
   PeopleAlt as ApplicantsIcon,
   Delete as DeleteIcon,
 } from "@mui/icons-material";
-
+import { getJobOpenings } from "../../services/api";
 const Jobs = () => {
   const navigate = useNavigate();
   const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
@@ -35,31 +35,44 @@ const Jobs = () => {
     "Internship",
   ];
 
-  // This will need to query the database
-  const [jobs, setJobs] = React.useState([
-    {
-      id: 1,
-      title: "Software Engineeing Intern",
-      description: "2025 Backend Summer Internship",
-      department: "Engineering",
-      level: "Intern",
-    },
-    {
-      id: 2,
-      title: "Marketing Manager",
-      description: "Digital Marketing Manager with 5 years of experience",
-      department: "Marketing",
-      level: "Manager",
-    },
-    {
-      id: 3,
-      title: "Business Intelligence Engineer",
-      description:
-        "With experience in serach engine optimization and data analysis",
-      department: "BI",
-      level: "Senior",
-    },
-  ]);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const businessId = "67d0daded458795a794012ec"; // This would typically be the logged-in business's ID
+
+  useEffect(() => {
+    const formatJobs = (jobs) => {
+      return jobs.map((job) => {
+        return {
+          id: job._id,
+          title: job.title,
+          description: job.description,
+          department: job.department_id,
+          level: job.position_level,
+        }
+      })
+    }
+
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        const data = await getJobOpenings(businessId);
+        const dataJobs = formatJobs(data)
+        setJobs(dataJobs);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch jobs:", err);
+        setError("Failed to load jobs. Please try again later.");
+        // Keep any existing jobs in state
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, [businessId]);
+
 
   const [newJob, setNewJob] = useState({
     id: 0,
@@ -175,8 +188,15 @@ const Jobs = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {jobs.map((job, index) => (
-                  <TableRow key={index}>
+                {jobs.length === 0 && !loading ? (
+                  <TableRow>
+                    <TableCell colSpan={7} align="center">
+                      <Typography variant="body1">No jobs found</Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  jobs.map((job, index) => (
+                    <TableRow key={index}>
                     <TableCell>{job.id}</TableCell>
                     <TableCell>{job.title}</TableCell>
                     <TableCell>{job.description}</TableCell>
@@ -201,7 +221,7 @@ const Jobs = () => {
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))}
+                )))}
               </TableBody>
             </Table>
           </TableContainer>

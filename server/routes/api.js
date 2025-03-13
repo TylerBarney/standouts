@@ -21,8 +21,6 @@ router.post('/job-openings', authMiddleware, controller.addJobOpening);
 router.get('/business/:businessId/applicants', authMiddleware, controller.getApplicants);
 router.post('/applicants', authMiddleware, controller.addApplicant);
 
-router.get('/business/:businessId/resumes', authMiddleware, controller.getResumes);
-router.post('/resumes', authMiddleware, controller.addResume);
 
 // You can add more routes or import from other route files here
 // Example: router.use('/products', require('./productRoutes'));
