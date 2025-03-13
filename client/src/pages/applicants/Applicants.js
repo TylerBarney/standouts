@@ -105,7 +105,7 @@ const Applicants = () => {
         return {
           id: applicant._id,
           job_opening_id: applicant.job_opening_id,
-          match_score: applicant.match_score,
+          compatibility: applicant.match_score,
           name: applicant.name,
           email: applicant.email,
           resume_url: applicant.resume_url,
@@ -359,35 +359,73 @@ const Applicants = () => {
                   </TableRow>
                 ) : (
                   applicants.map((applicant, index) => {
-                    if (job === undefined || applicant.job_opening_id === String(job.id)) {
+                    if (job === undefined || applicant.jobID === String(job.id)) {
                       return (
-                        <TableRow key={index}>
-                          <TableCell>
-                            <Button
-                              color="primary"
-                              onClick={() => viewApplicant(index)}
+                        <React.Fragment key={index}>
+                          <TableRow>
+                            <TableCell>
+                              <IconButton onClick={() => viewApplicant(index)}>
+                                {expandedRows[index] ? (
+                                  <ExpandLessIcon />
+                                ) : (
+                                  <ExpandMoreIcon />
+                                )}
+                              </IconButton>
+                            </TableCell>
+                            <TableCell>{applicant.name}</TableCell>
+                            <TableCell>{applicant.jobID}</TableCell>
+                            <TableCell>
+                              {Math.floor(applicant.compatibility * 100)}%
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                color="primary"
+                                onClick={() =>
+                                  downloadResume(applicant.name, applicant.jobID)
+                                }
+                              >
+                                <DownloadIcon />
+                              </Button>
+                            </TableCell>
+  
+                            <TableCell>
+                              <Button
+                                color="secondary"
+                                onClick={() => deleteApplicant(index)}
+                              >
+                                <DeleteIcon />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+  
+                          {/* Expandable Row with More Details */}
+                          <TableRow>
+                            <TableCell
+                              colSpan={7}
+                              style={{ paddingBottom: 0, paddingTop: 0 }}
                             >
-                              <AddIcon />
-                            </Button>
-                          </TableCell>
-                          <TableCell>{applicant.job_opening_id}</TableCell>
-                          <TableCell>{(applicant.match_score || 0) * 100}%</TableCell>
-                          <TableCell>{applicant.name}</TableCell>
-                          <TableCell>{applicant.email}</TableCell>
-                          <TableCell>
-                            <Button>
-                              <DownloadIcon />
-                            </Button>
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              color="secondary"
-                              onClick={() => deleteApplicant(index)}
-                            >
-                              <RemoveIcon />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
+                              <Collapse
+                                in={expandedRows[index]}
+                                timeout="auto"
+                                unmountOnExit
+                              >
+                                <Box margin={2}>
+                                  <Typography variant="body1">
+                                    <Box
+                                      display="flex"
+                                      justifyContent="space-between"
+                                      alignItems="center"
+                                    >
+                                      <Box>
+                                        <strong>Email:</strong> {applicant.email}
+                                      </Box>
+                                    </Box>
+                                  </Typography>
+                                </Box>
+                              </Collapse>
+                            </TableCell>
+                          </TableRow>
+                        </React.Fragment>
                       );
                     }
                     return null;
