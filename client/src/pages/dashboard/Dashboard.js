@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Typography,
   Paper,
@@ -11,6 +12,7 @@ import {
 
 const Dashboard = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   return (
     <Container maxWidth="lg">
@@ -41,15 +43,19 @@ const Dashboard = () => {
               </Typography>
               <Grid container spacing={2} sx={{ mt: 3 }}>
                 <Grid item>
-                  <Button variant="contained" color="primary">
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => navigate("/employees")}
+                  >
                     Get Started
                   </Button>
                 </Grid>
-                <Grid item>
+                {/* <Grid item>
                   <Button variant="contained" color="secondary">
                     Learn More
                   </Button>
-                </Grid>
+                </Grid> */}
               </Grid>
             </Paper>
           </Grid>
@@ -72,13 +78,17 @@ const Dashboard = () => {
                 compatilibites are scored.
               </Typography>
               <Grid container spacing={2} sx={{ mt: 3 }}>
-                <Grid item>
+                {/* <Grid item>
                   <Button variant="contained" color="primary">
                     Get Started
                   </Button>
-                </Grid>
+                </Grid> */}
                 <Grid item>
-                  <Button variant="contained" color="secondary">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => navigate("/applicants")}
+                  >
                     Learn more
                   </Button>
                 </Grid>
@@ -104,15 +114,19 @@ const Dashboard = () => {
               </Typography>
               <Grid container spacing={2} sx={{ mt: 3 }}>
                 <Grid item>
-                  <Button variant="contained" color="primary">
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => navigate("/jobs")}
+                  >
                     Get Started
                   </Button>
                 </Grid>
-                <Grid item>
+                {/* <Grid item>
                   <Button variant="contained" color="secondary">
                     Learn More
                   </Button>
-                </Grid>
+                </Grid> */}
               </Grid>
             </Paper>
           </Grid>
