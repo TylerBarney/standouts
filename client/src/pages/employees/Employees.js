@@ -27,7 +27,7 @@ import {
   Add as AddIcon,
   Cancel as CancelIcon,
 } from "@mui/icons-material";
-import { getEmployees } from "../../services/api";
+import { getEmployees, addEmployeeAPI, deleteEmployeeAPI } from "../../services/api";
 
 const Employees = () => {
   const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
@@ -54,8 +54,8 @@ const Employees = () => {
           id: employee._id,
           name: employee.name,
           department: employee.department,
-          level: employee.position_level,
-          resume: employee.resume,
+          position_level: employee.position_level,
+          resume_pdf: employee.resume_pdf,
         };
       });
     };
@@ -94,26 +94,37 @@ const Employees = () => {
   };
 
   //Add a resume to the frontend setResumes hook
-  const addEmployee = (employee) => {
-    setEmployees([...employees, employee]);
+  const addEmployee = async (employee) => {
+    const response = await addEmployeeAPI(employee);
+    console.log("Response", response);
+    if (response) {
+      console.log("Employee", response);
+      response.id = response._id;
+      setEmployees([...employees, response]);
+    } else {
+      console.log("Employee not added");
+    }
   };
 
-  const handleUploadResumes = () => {
+  const handleUploadResumes = async () => {
     // make the API call to upload the files to the database
-    files.forEach((file, index) => {
+    const uploadPromises = files.map(file => {
       // Simulated data (normally, this comes from the backend)
       const resume = {
-        resumeID: employees.length + index + 1,
         department: selectedDepartment,
-        level: selectedLevel,
+        position_level: selectedLevel,
         name: file.name.replace(".pdf", ""),
-        resume: file.name,
+        resume_pdf: file.name,
+        business_id: businessId,
       };
 
-      // Add the resume to the frontend
-      addEmployee(resume);
+      // Add the resume to the frontend and return the promise
+      return addEmployee(resume);
     });
 
+    // Wait for all uploads to complete
+    await Promise.all(uploadPromises);
+    
     console.log("Uploading files...", files);
     setOpenModal(false); //Close modal after upload
 
@@ -132,8 +143,14 @@ const Employees = () => {
     setSelectedLevel(e.target.value);
   };
 
-  const deleteResume = (index) => {
-    setEmployees(employees.filter((_, i) => i !== index));
+  const deleteResume = async(index) => {
+    const employee = employees[index];
+    const response = await deleteEmployeeAPI(employee.id);
+    if (response) {
+      setEmployees(employees.filter((_, i) => i !== index));
+    } else {
+      console.log("Employee not deleted");
+    }
   };
 
   const downloadResume = (employeeName) => {
@@ -345,7 +362,7 @@ const Employees = () => {
                       <TableCell>{employee.id}</TableCell>
                       <TableCell>{employee.name}</TableCell>
                       <TableCell>{employee.department}</TableCell>
-                      <TableCell>{employee.level}</TableCell>
+                      <TableCell>{employee.position_level}</TableCell>
                       <TableCell>
                       <Button
                         color="primary"

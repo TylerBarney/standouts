@@ -4,7 +4,7 @@
  */
 
 // Import models
-const { Business, Employee, JobOpening, Applicant } = require('../models/models');
+const { Business, Employee, JobOpening, Applicant } = require('../models/models.js');
 const logger = require('../utils/logger');
 
 // Controller methods
@@ -43,15 +43,13 @@ exports.getEmployees = async (req, res) => {
 
 exports.addEmployee = async (req, res) => {
   try {
-    const { name, business_id, resume_pdf, department_id, position_level, email } = req.body;
-    
+    const { name, business_id, resume_pdf, department, position_level } = req.body;
     const newEmployee = new Employee({
       name,
       business_id,
       resume_pdf,
-      department_id,
+      department,
       position_level,
-      email: email || `${name.toLowerCase().replace(/\s+/g, '.')}@example.com`
     });
     
     const savedEmployee = await newEmployee.save();
@@ -61,6 +59,17 @@ exports.addEmployee = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+exports.deleteEmployee = async (req, res) => {
+  try {
+    const employee = await Employee.findByIdAndDelete(req.params.employeeId);
+    res.status(200).json(employee);
+  } catch (error) {
+    logger.error('Error deleting employee', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 
 // Job Openings
 exports.getJobOpenings = async (req, res) => {

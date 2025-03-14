@@ -91,12 +91,22 @@ export const getEmployees = async (businessId) => {
   }
 };
 
-export const addEmployee = async (employeeData) => {
+export const addEmployeeAPI = async (employeeData) => {
   try {
     const response = await api.post('/employees', employeeData);
-    return response.data;
+    return response.data
   } catch (error) {
     console.error('Error adding employee:', error);
+    throw error;
+  }
+};
+
+export const deleteEmployeeAPI = async (employeeId) => {
+  try {
+    const response = await api.delete(`/employees/${employeeId}`);
+    return response.data;
+  } catch (error) { 
+    console.error('Error deleting employee:', error);
     throw error;
   }
 };

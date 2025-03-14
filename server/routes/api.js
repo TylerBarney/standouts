@@ -14,6 +14,7 @@ router.post('/business', authMiddleware, controller.addBusiness);
 
 router.get('/business/:businessId/employees', authMiddleware, controller.getEmployees);
 router.post('/employees', authMiddleware, controller.addEmployee);
+router.delete('/employees/:employeeId', authMiddleware, controller.deleteEmployee);
 
 router.get('/business/:businessId/job-openings', authMiddleware, controller.getJobOpenings);
 router.post('/job-openings', authMiddleware, controller.addJobOpening);
