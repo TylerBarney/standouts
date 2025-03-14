@@ -11,31 +11,45 @@ import {
   Grid,
   CssBaseline,
 } from "@mui/material";
+import { addBusiness } from "../../services/api";
 
 const Register = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const [companyName, setCompanyName] = useState("");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleRegister = () => {
-    if (!companyName || !username || !password) {
-      setError("Please enter a company name, username, and password");
+  const handleRegister = async () => {
+    if (!companyName || !email || !password) {
+      setError("Please enter a company name, email, and password");
       return;
     }
-    const companyData = { username, companyName };
 
-    // Simulate a register process (e.g., call API)
-    // You can replace the below logic with actual authentication logic
-    /* CHECK IF USERNAME ALREADY EXISTS IN DATABASE */
-    if (username != "test") {
-      login(companyData);
+    const businessData = {
+      name: companyName,
+      email: email,
+      password: password,
+    };
+
+    /* CHECK IF EMAIL ALREADY EXISTS IN DATABASE */
+
+    try {
+      // Call API to add business
+      const businessID = await addBusiness(businessData);
+
+      const localHostData = {
+        email,
+        companyName,
+        businessID,
+      };
+      login(localHostData);
       navigate("/dashboard");
-    } else {
-      setError("Invalid username");
+    } catch (error) {
+      console.error("Error registering business:", error);
+      setError("Registration failed. Please try again.");
     }
   };
 
@@ -66,15 +80,15 @@ const Register = () => {
             type="companyName"
           />
 
-          {/* Username input */}
+          {/* Email input */}
           <TextField
-            label="Username"
+            label="Email"
             variant="outlined"
             fullWidth
             margin="normal"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            type="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
           />
 
           {/* Password input */}
