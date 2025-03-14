@@ -21,6 +21,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import Jobs from "./pages/jobs/Jobs";
 import Applicants from "./pages/applicants/Applicants";
 import Employees from "./pages/employees/Employees";
+import Account from "./pages/account/Account";
 import { AuthProvider, useAuth } from "./pages/authentication/AuthContext";
 
 // Create a custom theme
@@ -131,6 +132,7 @@ function AppContext() {
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/applicants" element={<Applicants />} />
               <Route path="/employees" element={<Employees />} />
+              <Route path="/account" element={<Account />} />
               {/* Add more routes here */}
             </Route>
           </Routes>

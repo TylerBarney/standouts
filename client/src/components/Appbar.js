@@ -3,7 +3,7 @@ import { useAuth } from "../pages/authentication/AuthContext";
 
 import { useNavigate } from "react-router-dom";
 import { AppBar, Toolbar, Button, Typography } from "@mui/material";
-import { Person as PersonIcon } from "@mui/icons-material";
+import { AccountCircle as AccountCircleIcon } from "@mui/icons-material";
 
 const Appbar = () => {
   const navigate = useNavigate();
@@ -20,8 +20,8 @@ const Appbar = () => {
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           {companyName ? `Welcome, ${companyName}` : "Welcome"}
         </Typography>
-        <Button color="inherit">
-          <PersonIcon />
+        <Button color="inherit" onClick={() => navigate("/account")}>
+          <AccountCircleIcon />
         </Button>
         <Button color="inherit" onClick={handleLogout}>
           Logout
