@@ -16,6 +16,7 @@ import {
   Typography,
   Select,
   MenuItem,
+  Grid,
 } from "@mui/material";
 import {
   PeopleAlt as ApplicantsIcon,
@@ -50,15 +51,15 @@ const Jobs = () => {
           description: job.description,
           department: job.department_id,
           level: job.position_level,
-        }
-      })
-    }
+        };
+      });
+    };
 
     const fetchJobs = async () => {
       try {
         setLoading(true);
         const data = await getJobOpenings(businessId);
-        const dataJobs = formatJobs(data)
+        const dataJobs = formatJobs(data);
         setJobs(dataJobs);
         setError(null);
       } catch (err) {
@@ -72,7 +73,6 @@ const Jobs = () => {
 
     fetchJobs();
   }, [businessId]);
-
 
   const [newJob, setNewJob] = useState({
     id: 0,
@@ -105,61 +105,96 @@ const Jobs = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 8 }}>
+        <Typography variant="h1" gutterBottom color="primary.main">
+          Job Openings
+        </Typography>
         <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
-          <Typography variant="h2" gutterBottom color="primary.main">
-            Job Openings
+          <Typography variant="h5" gutterBottom color="black">
+            Add a New Job
           </Typography>
 
-          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-            <TextField
-              label="Title"
-              variant="outlined"
-              value={newJob.title}
-              onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
-            />
-            <TextField
-              label="Description"
-              variant="outlined"
-              value={newJob.description}
-              onChange={(e) =>
-                setNewJob({ ...newJob, description: e.target.value })
-              }
-            />
-            <Select
-              displayEmpty
-              value={newJob.department}
-              onChange={(e) =>
-                setNewJob({ ...newJob, department: e.target.value })
-              }
-            >
-              <MenuItem value="" disabled>
-                Department
-              </MenuItem>
-              {jobDepartments.map((department) => (
-                <MenuItem key={department} value={department}>
-                  {department}
-                </MenuItem>
-              ))}
-            </Select>
-            <Select
-              displayEmpty
-              value={newJob.level}
-              onChange={(e) => setNewJob({ ...newJob, level: e.target.value })}
-            >
-              <MenuItem value="" disabled>
-                Level
-              </MenuItem>
-              {jobLevels.map((level) => (
-                <MenuItem key={level} value={level}>
-                  {level}
-                </MenuItem>
-              ))}
-            </Select>
-            <Button variant="contained" color="primary" onClick={addJob}>
-              Add
-            </Button>
+          {/* Form Section */}
+          <Box sx={{ mb: 2 }}>
+            <Grid container spacing={2}>
+              {/* Title */}
+              <Grid item xs={12} sm={3}>
+                <TextField
+                  label="Title"
+                  variant="outlined"
+                  value={newJob.title}
+                  fullWidth
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, title: e.target.value })
+                  }
+                />
+              </Grid>
+
+              {/* Description */}
+              <Grid item xs={12} sm={3}>
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  value={newJob.description}
+                  fullWidth
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, description: e.target.value })
+                  }
+                />
+              </Grid>
+
+              {/* Department */}
+              <Grid item xs={12} sm={3}>
+                <Select
+                  displayEmpty
+                  value={newJob.department}
+                  fullWidth
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, department: e.target.value })
+                  }
+                >
+                  <MenuItem value="" disabled>
+                    Department
+                  </MenuItem>
+                  {jobDepartments.map((department) => (
+                    <MenuItem key={department} value={department}>
+                      {department}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+
+              {/* Level */}
+              <Grid item xs={12} sm={3}>
+                <Select
+                  displayEmpty
+                  value={newJob.level}
+                  fullWidth
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, level: e.target.value })
+                  }
+                >
+                  <MenuItem value="" disabled>
+                    Level
+                  </MenuItem>
+                  {jobLevels.map((level) => (
+                    <MenuItem key={level} value={level}>
+                      {level}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Button variant="contained" color="primary" onClick={addJob}>
+                  Add
+                </Button>
+              </Grid>
+            </Grid>
           </Box>
 
+          <Typography variant="h5" gutterBottom color="black">
+            View Current Jobs
+          </Typography>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -197,31 +232,32 @@ const Jobs = () => {
                 ) : (
                   jobs.map((job, index) => (
                     <TableRow key={index}>
-                    <TableCell>{job.id}</TableCell>
-                    <TableCell>{job.title}</TableCell>
-                    <TableCell>{job.description}</TableCell>
-                    <TableCell>{job.department}</TableCell>
-                    <TableCell>{job.level}</TableCell>
-                    <TableCell>
-                      <Button
-                        color="primary"
-                        onClick={() =>
-                          navigate("/applicants", { state: { job } })
-                        }
-                      >
-                        <ApplicantsIcon />
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        color="secondary"
-                        onClick={() => deleteJob(index)}
-                      >
-                        <DeleteIcon />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )))}
+                      <TableCell>{job.id}</TableCell>
+                      <TableCell>{job.title}</TableCell>
+                      <TableCell>{job.description}</TableCell>
+                      <TableCell>{job.department}</TableCell>
+                      <TableCell>{job.level}</TableCell>
+                      <TableCell>
+                        <Button
+                          color="primary"
+                          onClick={() =>
+                            navigate("/applicants", { state: { job } })
+                          }
+                        >
+                          <ApplicantsIcon />
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          color="secondary"
+                          onClick={() => deleteJob(index)}
+                        >
+                          <DeleteIcon />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
