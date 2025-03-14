@@ -1,34 +1,45 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-// Create the authentication context
 const AuthContext = createContext();
 
-// Custom hook to use the authentication context
 export const useAuth = () => useContext(AuthContext);
 
-// AuthProvider component to wrap the app and provide authentication state
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [company, setCompany] = useState(null);
   const [companyName, setCompanyName] = useState("");
+  const [loading, setLoading] = useState(true); // Prevents flickering on refresh
 
-  // Simulating a login/logout function
+  useEffect(() => {
+    const storedCompany = localStorage.getItem("company");
+    if (storedCompany) {
+      const companyData = JSON.parse(storedCompany);
+      setCompany(companyData);
+      setCompanyName(companyData.companyName || "");
+      setIsAuthenticated(true);
+    }
+    setLoading(false); // Mark loading as complete
+  }, []);
+
   const login = (companyData) => {
     setCompany(companyData);
     setCompanyName(companyData.companyName || "");
     setIsAuthenticated(true);
+    localStorage.setItem("company", JSON.stringify(companyData));
   };
+
   const logout = () => {
     setCompany(null);
     setCompanyName("");
     setIsAuthenticated(false);
+    localStorage.removeItem("company");
   };
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, company, companyName, login, logout }}
+      value={{ isAuthenticated, company, companyName, login, logout, loading }}
     >
-      {children}
+      {!loading && children} {/* Prevent rendering until loading is done */}
     </AuthContext.Provider>
   );
 };
