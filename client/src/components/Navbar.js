@@ -37,7 +37,7 @@ const Navbar = () => {
   };
 
   // Determine drawer width based on open state and screen size
-  const drawerWidth = isMobile ? 60 : open ? 240 : 68;
+  const drawerWidth = isMobile ? 70 : open ? 240 : 70;
 
   // List of navigation items
   const navItems = [
@@ -118,7 +118,7 @@ const Navbar = () => {
         <Divider sx={{ bgcolor: "primary.light", opacity: 0.2, mx: 1 }} />
 
         {/* Navigation Links */}
-        <List sx={{ flexGrow: 1, pt: 2, px: 1 }}>
+        <List sx={{ flexGrow: 1, pt: 2, px: 1, alignItems: "center" }}>
           {navItems.map((item) => (
             <Tooltip
               key={item.text}
