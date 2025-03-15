@@ -56,10 +56,15 @@ const Register = () => {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <Typography variant="h1" gutterBottom color="primary.main">
+      <Typography
+        variant="h1"
+        gutterBottom
+        color="primary.main"
+        style={{ marginTop: "50px" }}
+      >
         Welcome to <strong>StandOut</strong>
       </Typography>
-      <Paper elevation={3} style={{ padding: "20px", marginTop: "100px" }}>
+      <Paper elevation={3} style={{ padding: "20px", marginTop: "50px" }}>
         <Box display="flex" flexDirection="column" alignItems="center">
           <Typography variant="h5" gutterBottom>
             Register
