@@ -23,18 +23,16 @@ import {
   Select,
   MenuItem,
   CircularProgress,
-  Alert,
 } from "@mui/material";
 import {
-  WorkOutline as WorkOutlineIcon,
   Delete as DeleteIcon,
   ExpandLess as ExpandLessIcon,
   ExpandMore as ExpandMoreIcon,
   Download as DownloadIcon,
   KeyboardBackspace as KeyboardBackspaceIcon,
   Add as AddIcon,
-  Remove as RemoveIcon,
   Cancel as CancelIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { getApplicants } from "../../services/api";
 
@@ -90,11 +88,11 @@ const Applicants = () => {
   const handleJobChange = (e) => {
     setSelectedJob(e.target.value);
   };
-  
+
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Temporary business ID - in a real app, this would come from auth context or similar
   const businessId = "67d0daded458795a794012ec"; // This would typically be the logged-in business's ID
 
@@ -109,10 +107,10 @@ const Applicants = () => {
           name: applicant.name,
           email: applicant.email,
           resume_url: applicant.resume_url,
-        }
-      })
-    }
-    
+        };
+      });
+    };
+
     const fetchApplicants = async () => {
       try {
         setLoading(true);
@@ -132,7 +130,6 @@ const Applicants = () => {
 
     fetchApplicants();
   }, [businessId, job]); // Re-fetch if businessId changes
-
 
   const deleteApplicant = (index) => {
     // In a real app, you would call an API to delete the applicant
@@ -181,7 +178,13 @@ const Applicants = () => {
   if (loading && applicants.length === 0) {
     return (
       <Container>
-        <Box my={4} display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+        <Box
+          my={4}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+        >
           <CircularProgress />
         </Box>
       </Container>
@@ -215,7 +218,21 @@ const Applicants = () => {
                 p: 4,
               }}
             >
-              <Typography variant="h6" gutterBottom>
+              {/* Close Button (X) */}
+              <IconButton
+                onClick={() => setOpenModal(false)}
+                sx={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  color: "text.primary", // You can change the color here
+                }}
+                aria-label="close"
+              >
+                <CloseIcon />
+              </IconButton>
+
+              <Typography variant="h5" gutterBottom>
                 Upload Resumes
               </Typography>
 
@@ -226,7 +243,7 @@ const Applicants = () => {
                   labelId="job-id-select-label"
                   id="job-id-select"
                   value={selectedJob}
-                  label="Job ID"
+                  label="Select Job ID"
                   onChange={handleJobChange}
                 >
                   {jobIds.map((jobId) => (
@@ -237,13 +254,15 @@ const Applicants = () => {
                 </Select>
               </FormControl>
 
-              <TextField
-                fullWidth
-                type="file"
-                inputProps={{ multiple: true }}
-                onChange={handleFileChange}
-                sx={{ marginBottom: 2 }}
-              />
+              <FormControl fullWidth margin="normal">
+                <TextField
+                  fullWidth
+                  type="file"
+                  inputProps={{ multiple: true }}
+                  onChange={handleFileChange}
+                  sx={{ marginBottom: 2 }}
+                />
+              </FormControl>
               <Button
                 variant="contained"
                 onClick={handleUploadResumes}
@@ -352,12 +371,17 @@ const Applicants = () => {
                 {applicants.length === 0 && !loading ? (
                   <TableRow>
                     <TableCell colSpan={7} align="center">
-                      <Typography variant="body1">No applicants found</Typography>
+                      <Typography variant="body1">
+                        No applicants found
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
                   applicants.map((applicant, index) => {
-                    if (job === undefined || applicant.jobID === String(job.id)) {
+                    if (
+                      job === undefined ||
+                      applicant.jobID === String(job.id)
+                    ) {
                       return (
                         <React.Fragment key={index}>
                           <TableRow>
@@ -379,13 +403,16 @@ const Applicants = () => {
                               <Button
                                 color="primary"
                                 onClick={() =>
-                                  downloadResume(applicant.name, applicant.jobID)
+                                  downloadResume(
+                                    applicant.name,
+                                    applicant.jobID
+                                  )
                                 }
                               >
                                 <DownloadIcon />
                               </Button>
                             </TableCell>
-  
+
                             <TableCell>
                               <Button
                                 color="secondary"
@@ -395,7 +422,7 @@ const Applicants = () => {
                               </Button>
                             </TableCell>
                           </TableRow>
-  
+
                           {/* Expandable Row with More Details */}
                           <TableRow>
                             <TableCell
@@ -415,7 +442,8 @@ const Applicants = () => {
                                       alignItems="center"
                                     >
                                       <Box>
-                                        <strong>Email:</strong> {applicant.email}
+                                        <strong>Email:</strong>{" "}
+                                        {applicant.email}
                                       </Box>
                                     </Box>
                                   </Typography>
