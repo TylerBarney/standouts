@@ -11,36 +11,52 @@ import {
   Grid,
   CssBaseline,
 } from "@mui/material";
+import { getBusinessInfoByEmail } from "../../services/api";
 
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [inputEmail, setInputEmail] = useState("");
+  const [inputPassword, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    if (!username || !password) {
-      setError("Please enter both username and password");
+  const handleLogin = async () => {
+    if (!inputEmail || !inputPassword) {
+      setError("Please enter both inputEmail and inputPassword");
       return;
     }
 
-    const companyData = { username, companyName: "Test Company" };
-
     // Simulate a login process (e.g., call API)
     // You can replace the below logic with actual authentication logic
-    if (username === "test" && password === "test") {
-      login(companyData);
+    try {
+      const { _id, name, password } = await getBusinessInfoByEmail(inputEmail);
+      console.log(inputPassword);
+      console.log(password);
+
+      if (inputPassword != password) {
+        setError("!!!Invalid inputEmail or inputPassword");
+        return;
+      }
+
+      console.log("pass!: ", inputPassword);
+
+      const businessData = { inputEmail, companyName: name, businessId: _id };
+
+      login(businessData);
       navigate("/dashboard");
-    } else {
-      setError("Invalid username or password");
+    } catch (error) {
+      console.error("Error logging in:", error);
+      setError("Invalid email or password");
     }
   };
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
+      <Typography variant="h1" gutterBottom color="primary.main">
+        Welcome to <strong>StandOut</strong>
+      </Typography>
       <Paper elevation={3} style={{ padding: "20px", marginTop: "100px" }}>
         <Box display="flex" flexDirection="column" alignItems="center">
           <Typography variant="h5" gutterBottom>
@@ -54,26 +70,26 @@ const Login = () => {
             </Typography>
           )}
 
-          {/* Username input */}
+          {/* inputEmail input */}
           <TextField
-            label="Username"
+            label="Email"
             variant="outlined"
             fullWidth
             margin="normal"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            type="username"
+            value={inputEmail}
+            onChange={(e) => setInputEmail(e.target.value)}
+            type="inputEmail"
           />
 
-          {/* Password input */}
+          {/* inputPassword input */}
           <TextField
             label="Password"
             variant="outlined"
             fullWidth
             margin="normal"
-            value={password}
+            value={inputPassword}
             onChange={(e) => setPassword(e.target.value)}
-            type="password"
+            type="inputPassword"
           />
 
           {/* Login button */}
