@@ -102,6 +102,16 @@ exports.addJobOpening = async (req, res) => {
   }
 };
 
+exports.deleteJobOpening = async (req, res) => {
+  try {
+    const jobOpening = await JobOpening.findByIdAndDelete(req.params.jobOpeningId);
+    res.status(200).json(jobOpening);
+  } catch (error) {
+    logger.error('Error deleting job opening', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 // Applicants
 exports.getApplicants = async (req, res) => {
   try {
@@ -115,7 +125,7 @@ exports.getApplicants = async (req, res) => {
 
 exports.addApplicant = async (req, res) => {
   try {
-    const { name, email, business_id, job_opening_id, resume_pdf, department_id, position_level, match_score } = req.body;
+    const { name, email, business_id, job_opening_id, resume_pdf, department_id, position_level, compatibility } = req.body;
     
     const newApplicant = new Applicant({
       name,
@@ -125,7 +135,7 @@ exports.addApplicant = async (req, res) => {
       resume_pdf,
       department_id,
       position_level,
-      match_score: match_score || 0
+      compatibility: compatibility || 0
     });
     
     const savedApplicant = await newApplicant.save();
@@ -136,4 +146,13 @@ exports.addApplicant = async (req, res) => {
   }
 };
 
+exports.deleteApplicant = async (req, res) => {
+  try {
+    const applicant = await Applicant.findByIdAndDelete(req.params.applicantId);
+    res.status(200).json(applicant);
+  } catch (error) {
+    logger.error('Error deleting applicant', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 // Add more controller methods as needed 

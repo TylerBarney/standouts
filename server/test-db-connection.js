@@ -77,7 +77,7 @@ mongoose.connect(mongoUri, mongoOptions)
         resume_pdf: 'path/to/applicant/resume.pdf',
         department_id: 'DEP001',
         position_level: 'Entry',
-        match_score: 85
+        compatibility: 85
       });
       const savedApplicant = await applicant.save();
       console.log('Applicant created:', savedApplicant._id);

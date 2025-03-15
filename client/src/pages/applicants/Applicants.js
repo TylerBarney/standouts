@@ -36,11 +36,12 @@ import {
   Remove as RemoveIcon,
   Cancel as CancelIcon,
 } from "@mui/icons-material";
-import { getApplicants } from "../../services/api";
+import { getApplicants, getJobOpenings, addApplicantAPI, deleteApplicantAPI } from "../../services/api";
 
 const Applicants = () => {
   const location = useLocation();
-  const jobIds = ["1", "2", "3", "4", "5"];
+
+  const [job_openings, setJobOpenings] = useState([]);
 
   const [job, setJob] = React.useState(location.state?.job || undefined);
   const [expandedRows, setExpandedRows] = React.useState({});
@@ -59,8 +60,16 @@ const Applicants = () => {
     setFiles(files.filter((_, i) => i !== index));
   };
 
-  const addApplicant = (applicant) => {
-    setApplicants([...applicants, applicant]);
+  const addApplicant = async (applicant) => {
+    try {
+      const response = await addApplicantAPI(applicant);
+      if (response) {
+        response.id = response._id;
+        setApplicants([...applicants, response]);
+      }
+    } catch (error) {
+      console.error("Failed to add applicant:", error);
+    }
   };
 
   const handleUploadResumes = () => {
@@ -68,10 +77,14 @@ const Applicants = () => {
     files.forEach((file, index) => {
       // Simulated data (normally, this comes from the backend)
       const applicant = {
-        jobID: selectedJob,
+        job_opening_id: selectedJob,
         compatibility: 0.8,
         name: file.name.replace(".pdf", ""),
         email: "fakeEmail123@gmail.com",
+        business_id: "67d0daded458795a794012ec",
+        resume_pdf: file.name,
+        department_id: selectedJob.department_id,
+        position_level: selectedJob.position_level,
       };
 
       // Add the applicant to the frontend
@@ -104,11 +117,13 @@ const Applicants = () => {
       return applicants.map((applicant) => {
         return {
           id: applicant._id,
-          jobID: applicant.job_opening_id,
-          compatibility: applicant.match_score,
+          job_opening_id: applicant.job_opening_id,
+          compatibility: applicant.compatibility,
           name: applicant.name,
           email: applicant.email,
-          resume_url: applicant.resume_url,
+          resume_pdf: applicant.resume_pdf,
+          department_id: applicant.department_id,
+          position_level: applicant.position_level,
         }
       })
     }
@@ -130,13 +145,34 @@ const Applicants = () => {
       }
     };
 
+    const fetchJobOpenings = async () => {
+      try {
+        const data = await getJobOpenings(businessId);
+        // Add IDs to the objects
+        data.forEach(job => job.id = job._id);
+        // Then set the entire array
+        setJobOpenings(data);
+      } catch (err) {
+        console.error("Failed to fetch job openings:", err);
+        setError("Failed to load job openings. Please try again later.");
+      }
+    };
+
     fetchApplicants();
+    fetchJobOpenings();
   }, [businessId, job]); // Re-fetch if businessId changes
 
 
-  const deleteApplicant = (index) => {
-    // In a real app, you would call an API to delete the applicant
-    setApplicants(applicants.filter((_, i) => i !== index));
+  const deleteApplicant = async (index) => {
+    const applicant = applicants[index];
+    try {
+      const response = await deleteApplicantAPI(applicant.id);
+      if (response) {
+        setApplicants(applicants.filter((_, i) => i !== index));
+      }
+    } catch (error) {
+      console.error("Failed to delete applicant:", error);
+    }
   };
 
   const viewApplicant = (index) => {
@@ -150,7 +186,7 @@ const Applicants = () => {
     setJob(undefined);
   };
 
-  const downloadResume = (applicantName, jobID) => {
+  const downloadResume = (applicantName, job_opening_id) => {
     try {
       // Replace space with underscore
       const name = applicantName.replace(/ /g, "_");
@@ -163,7 +199,7 @@ const Applicants = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `job${jobID}_${name}_Resume.pdf`; // Set download filename
+      a.download = `job${job_opening_id}_${name}_Resume.pdf`; // Set download filename
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -229,9 +265,9 @@ const Applicants = () => {
                   label="Job ID"
                   onChange={handleJobChange}
                 >
-                  {jobIds.map((jobId) => (
-                    <MenuItem key={jobId} value={jobId}>
-                      {jobId}
+                  {job_openings.map((job_opening) => (
+                    <MenuItem key={job_opening.id} value={job_opening}>
+                      {job_opening.id}
                     </MenuItem>
                   ))}
                 </Select>
@@ -357,7 +393,7 @@ const Applicants = () => {
                   </TableRow>
                 ) : (
                   applicants.map((applicant, index) => {
-                    if (job === undefined || applicant.jobID === String(job.id)) {
+                    if (job === undefined || applicant.job_opening_id === String(job.id)) {
                       return (
                         <React.Fragment key={index}>
                           <TableRow>
@@ -371,7 +407,7 @@ const Applicants = () => {
                               </IconButton>
                             </TableCell>
                             <TableCell>{applicant.name}</TableCell>
-                            <TableCell>{applicant.jobID}</TableCell>
+                            <TableCell>{applicant.job_opening_id}</TableCell>
                             <TableCell>
                               {Math.floor(applicant.compatibility * 100)}%
                             </TableCell>
@@ -379,7 +415,7 @@ const Applicants = () => {
                               <Button
                                 color="primary"
                                 onClick={() =>
-                                  downloadResume(applicant.name, applicant.jobID)
+                                  downloadResume(applicant.name, applicant.job_opening_id)
                                 }
                               >
                                 <DownloadIcon />
