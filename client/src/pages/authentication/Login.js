@@ -31,11 +31,9 @@ const Login = () => {
     // You can replace the below logic with actual authentication logic
     try {
       const { _id, name, password } = await getBusinessInfoByEmail(inputEmail);
-      console.log(inputPassword);
-      console.log(password);
 
       if (inputPassword != password) {
-        setError("!!!Invalid inputEmail or inputPassword");
+        setError("Invalid inputEmail or inputPassword");
         return;
       }
 

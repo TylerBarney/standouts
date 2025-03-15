@@ -26,7 +26,6 @@ exports.getBusinessInfo = async (req, res) => {
 exports.getBusinessInfoByEmail = async (req, res) => {
   try {
     const business = await Business.findOne({ email: req.params.email });
-    console.log("BUSINESS: ", business);
     if (!business) {
       return res.status(404).json({ error: "Business not found" });
     }
