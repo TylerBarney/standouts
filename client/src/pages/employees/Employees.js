@@ -26,8 +26,13 @@ import {
   Download as DownloadIcon,
   Add as AddIcon,
   Cancel as CancelIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
-import { getEmployees, addEmployeeAPI, deleteEmployeeAPI } from "../../services/api";
+import {
+  getEmployees,
+  addEmployeeAPI,
+  deleteEmployeeAPI,
+} from "../../services/api";
 
 const Employees = () => {
   const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
@@ -63,7 +68,7 @@ const Employees = () => {
       try {
         setLoading(true);
         const data = await getEmployees(businessId);
-        const dataEmployees = formatEmployees(data)
+        const dataEmployees = formatEmployees(data);
         setEmployees(dataEmployees);
         setError(null);
       } catch (err) {
@@ -76,7 +81,6 @@ const Employees = () => {
     };
     fetchEmployees();
   }, [businessId]);
-
 
   const [openModal, setOpenModal] = React.useState(false);
   const [files, setFiles] = React.useState([]);
@@ -108,7 +112,7 @@ const Employees = () => {
 
   const handleUploadResumes = async () => {
     // make the API call to upload the files to the database
-    const uploadPromises = files.map(file => {
+    const uploadPromises = files.map((file) => {
       // Simulated data (normally, this comes from the backend)
       const resume = {
         department: selectedDepartment,
@@ -124,7 +128,7 @@ const Employees = () => {
 
     // Wait for all uploads to complete
     await Promise.all(uploadPromises);
-    
+
     console.log("Uploading files...", files);
     setOpenModal(false); //Close modal after upload
 
@@ -143,7 +147,7 @@ const Employees = () => {
     setSelectedLevel(e.target.value);
   };
 
-  const deleteResume = async(index) => {
+  const deleteResume = async (index) => {
     const employee = employees[index];
     const response = await deleteEmployeeAPI(employee.id);
     if (response) {
@@ -202,23 +206,37 @@ const Employees = () => {
                 transform: "translate(-50%, -50%)",
                 width: 400,
                 bgcolor: "background.paper",
-                border: "2px solid #000",
+                border: "2px solid #222",
                 boxShadow: 24,
                 p: 4,
               }}
             >
-              <Typography variant="h6" gutterBottom>
+              {/* Close Button (X) */}
+              <IconButton
+                onClick={() => setOpenModal(false)}
+                sx={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  color: "text.primary", // You can change the color here
+                }}
+                aria-label="close"
+              >
+                <CloseIcon />
+              </IconButton>
+
+              <Typography variant="h5" gutterBottom>
                 Upload Resumes
               </Typography>
 
+              {/* Level Dropdown */}
               <FormControl fullWidth margin="normal">
-                {/* Level Dropdown */}
-                <InputLabel id="level-select-label">Select Job ID</InputLabel>
+                <InputLabel id="level-select">Select Level</InputLabel>
                 <Select
-                  labelId="level-select-label"
+                  labelId="level-select"
                   id="level-select"
                   value={selectedLevel}
-                  label="Level"
+                  label="Select Level"
                   onChange={handleLevelChange}
                 >
                   {jobLevels.map((level) => (
@@ -227,16 +245,18 @@ const Employees = () => {
                     </MenuItem>
                   ))}
                 </Select>
+              </FormControl>
 
-                {/* Department Dropdown */}
-                <InputLabel id="department-select-label">
-                  Select Job ID
+              {/* Department Dropdown */}
+              <FormControl fullWidth margin="normal">
+                <InputLabel id="department-select">
+                  Select Department
                 </InputLabel>
                 <Select
-                  labelId="department-select-label"
+                  labelId="department-select"
                   id="department-select"
                   value={selectedDepartment}
-                  label="Department"
+                  label="Select Department"
                   onChange={handleDepartmentChange}
                 >
                   {jobDepartments.map((department) => (
@@ -247,13 +267,15 @@ const Employees = () => {
                 </Select>
               </FormControl>
 
-              <TextField
-                fullWidth
-                type="file"
-                inputProps={{ multiple: true }}
-                onChange={handleFileChange}
-                sx={{ marginBottom: 2 }}
-              />
+              <FormControl fullWidth margin="normal">
+                <TextField
+                  fullWidth
+                  type="file"
+                  inputProps={{ multiple: true }}
+                  onChange={handleFileChange}
+                  sx={{ marginBottom: 2 }}
+                />
+              </FormControl>
               <Button
                 variant="contained"
                 onClick={handleUploadResumes}
@@ -353,7 +375,9 @@ const Employees = () => {
                 {employees.length === 0 && !loading ? (
                   <TableRow>
                     <TableCell colSpan={7} align="center">
-                      <Typography variant="body1">No employees found</Typography>
+                      <Typography variant="body1">
+                        No employees found
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -364,24 +388,25 @@ const Employees = () => {
                       <TableCell>{employee.department}</TableCell>
                       <TableCell>{employee.position_level}</TableCell>
                       <TableCell>
-                      <Button
-                        color="primary"
-                        onClick={() => downloadResume(employee.name)}
-                      >
-                        <DownloadIcon />
-                      </Button>
-                    </TableCell>
+                        <Button
+                          color="primary"
+                          onClick={() => downloadResume(employee.name)}
+                        >
+                          <DownloadIcon />
+                        </Button>
+                      </TableCell>
 
-                    <TableCell>
-                      <Button
-                        color="secondary"
-                        onClick={() => deleteResume(index)}
-                      >
-                        <DeleteIcon />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )))}
+                      <TableCell>
+                        <Button
+                          color="secondary"
+                          onClick={() => deleteResume(index)}
+                        >
+                          <DeleteIcon />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
