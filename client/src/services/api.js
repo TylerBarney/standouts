@@ -71,6 +71,17 @@ export const addJobOpening = async (jobOpeningData) => {
   }
 };
 
+export const deleteJobOpening = async (jobOpeningId) => {
+  try {
+    const response = await api.delete(`/job-openings/${jobOpeningId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting job opening:', error);
+    throw error;
+  }
+};
+
+
 export const getApplicants = async (businessId) => {
   try {
     const response = await api.get(`/business/${businessId}/applicants`);
@@ -81,7 +92,8 @@ export const getApplicants = async (businessId) => {
   }
 };
 
-export const addApplicant = async (applicantData) => {
+export const addApplicantAPI = async (applicantData) => {
+  console.log("Adding applicant:", applicantData);
   try {
     const response = await api.post("/applicants", applicantData);
     return response.data;
@@ -90,6 +102,17 @@ export const addApplicant = async (applicantData) => {
     throw error;
   }
 };
+
+export const deleteApplicantAPI = async (applicantId) => {
+  try {
+    const response = await api.delete(`/applicants/${applicantId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting applicant:', error);
+    throw error;
+  }
+};
+
 
 export const getEmployees = async (businessId) => {
   try {

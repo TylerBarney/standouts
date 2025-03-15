@@ -28,19 +28,13 @@ router.delete(
   controller.deleteEmployee
 );
 
-router.get(
-  "/business/:businessId/job-openings",
-  authMiddleware,
-  controller.getJobOpenings
-);
-router.post("/job-openings", authMiddleware, controller.addJobOpening);
+router.get('/business/:businessId/job-openings', authMiddleware, controller.getJobOpenings);
+router.post('/job-openings', authMiddleware, controller.addJobOpening);
+router.delete('/job-openings/:jobOpeningId', authMiddleware, controller.deleteJobOpening);
 
-router.get(
-  "/business/:businessId/applicants",
-  authMiddleware,
-  controller.getApplicants
-);
-router.post("/applicants", authMiddleware, controller.addApplicant);
+router.get('/business/:businessId/applicants', authMiddleware, controller.getApplicants);
+router.post('/applicants', authMiddleware, controller.addApplicant);
+router.delete('/applicants/:applicantId', authMiddleware, controller.deleteApplicant);
 
 router.get(
   "/business/info/:email",

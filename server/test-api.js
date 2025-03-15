@@ -225,7 +225,7 @@ const testApplicantAPI = async () => {
     resume_pdf: 'path/to/applicant_resume.pdf',
     department_id: 'DEP001',
     position_level: 'Entry',
-    match_score: 85
+    compatibility: 85
   };
   
   const createResponse = await axios.post(`${API_BASE_URL}/applicants`, applicantData);

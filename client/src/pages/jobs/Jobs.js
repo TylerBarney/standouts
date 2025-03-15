@@ -22,7 +22,7 @@ import {
   PeopleAlt as ApplicantsIcon,
   Delete as DeleteIcon,
 } from "@mui/icons-material";
-import { getJobOpenings } from "../../services/api";
+import { getJobOpenings, addJobOpening, deleteJobOpening } from "../../services/api";
 const Jobs = () => {
   const navigate = useNavigate();
   const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
@@ -49,8 +49,9 @@ const Jobs = () => {
           id: job._id,
           title: job.title,
           description: job.description,
-          department: job.department_id,
-          level: job.position_level,
+          department_id: job.department_id,
+          position_level: job.position_level,
+          business_id: job.business_id,
         };
       });
     };
@@ -78,28 +79,41 @@ const Jobs = () => {
     id: 0,
     title: "",
     description: "",
-    department: "",
-    level: "",
+    department_id: "",
+    position_level: "",
+    business_id: businessId,
   });
 
   // This will need to add the job to the database
-  const addJob = () => {
+  const addJob = async () => {
     if (newJob.title.trim() && newJob.description.trim()) {
-      newJob.id = jobs.length + 1;
-      setJobs([...jobs, newJob]);
+      const response = await addJobOpening(newJob);
+      if (response) {
+        response.id = response._id;
+        setJobs([...jobs, response]);
+      } else {
+        console.log("Job not added");
+      }
       setNewJob({
         id: 0,
         title: "",
         description: "",
-        department: "",
-        level: "",
+        department_id: "",
+        position_level: "",
+        business_id: businessId,
       });
     }
   };
 
   // This will need to delete the job from the database
-  const deleteJob = (index) => {
-    setJobs(jobs.filter((_, i) => i !== index));
+  const deleteJob = async (index) => {
+    const job = jobs[index];
+    const response = await deleteJobOpening(job.id);
+    if (response) {
+      setJobs(jobs.filter((_, i) => i !== index));
+    } else {
+      console.log("Job not deleted");
+    }
   };
 
   return (
@@ -146,10 +160,10 @@ const Jobs = () => {
               <Grid item xs={12} sm={3}>
                 <Select
                   displayEmpty
-                  value={newJob.department}
+                  value={newJob.department_id}
                   fullWidth
                   onChange={(e) =>
-                    setNewJob({ ...newJob, department: e.target.value })
+                    setNewJob({ ...newJob, department_id: e.target.value })
                   }
                 >
                   <MenuItem value="" disabled>
@@ -167,10 +181,10 @@ const Jobs = () => {
               <Grid item xs={12} sm={3}>
                 <Select
                   displayEmpty
-                  value={newJob.level}
+                  value={newJob.position_level}
                   fullWidth
                   onChange={(e) =>
-                    setNewJob({ ...newJob, level: e.target.value })
+                    setNewJob({ ...newJob, position_level: e.target.value })
                   }
                 >
                   <MenuItem value="" disabled>
@@ -235,8 +249,8 @@ const Jobs = () => {
                       <TableCell>{job.id}</TableCell>
                       <TableCell>{job.title}</TableCell>
                       <TableCell>{job.description}</TableCell>
-                      <TableCell>{job.department}</TableCell>
-                      <TableCell>{job.level}</TableCell>
+                      <TableCell>{job.department_id}</TableCell>
+                      <TableCell>{job.position_level}</TableCell>
                       <TableCell>
                         <Button
                           color="primary"

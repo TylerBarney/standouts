@@ -76,7 +76,7 @@ const ApplicantSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  match_score: {
+  compatibility: {
     type: Number,
     required: false
   }
