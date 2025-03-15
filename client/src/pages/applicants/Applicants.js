@@ -14,14 +14,6 @@ import {
   Typography,
   Collapse,
   IconButton,
-  Modal,
-  Fade,
-  Backdrop,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   CircularProgress,
 } from "@mui/material";
 import {
@@ -30,11 +22,9 @@ import {
   ExpandMore as ExpandMoreIcon,
   Download as DownloadIcon,
   KeyboardBackspace as KeyboardBackspaceIcon,
-  Add as AddIcon,
-  Cancel as CancelIcon,
-  Close as CloseIcon,
 } from "@mui/icons-material";
 import { getApplicants } from "../../services/api";
+import UploadModal from "./UploadModal";
 
 const Applicants = () => {
   const location = useLocation();
@@ -46,16 +36,6 @@ const Applicants = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [files, setFiles] = React.useState([]);
   const [selectedJob, setSelectedJob] = React.useState("");
-
-  const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    setFiles(selectedFiles);
-  };
-
-  //Remove file from import
-  const removeFile = (index) => {
-    setFiles(files.filter((_, i) => i !== index));
-  };
 
   const addApplicant = (applicant) => {
     setApplicants([...applicants, applicant]);
@@ -83,10 +63,6 @@ const Applicants = () => {
     setFiles([]);
     // Clear the selected job after upload
     setSelectedJob("");
-  };
-
-  const handleJobChange = (e) => {
-    setSelectedJob(e.target.value);
   };
 
   const [applicants, setApplicants] = useState([]);
@@ -192,134 +168,28 @@ const Applicants = () => {
   }
 
   return (
-    <Container>
-      <Box my={4}>
+    <Container maxWidth="lg">
+      <Box sx={{ mt: 4, mb: 8 }}>
         {/* Modal for file upload */}
-        <Modal
-          open={openModal}
-          onClose={() => setOpenModal(false)}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500,
-          }}
-        >
-          <Fade in={openModal}>
-            <Box
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: 400,
-                bgcolor: "background.paper",
-                border: "2px solid #000",
-                boxShadow: 24,
-                p: 4,
-              }}
-            >
-              {/* Close Button (X) */}
-              <IconButton
-                onClick={() => setOpenModal(false)}
-                sx={{
-                  position: "absolute",
-                  top: 8,
-                  right: 8,
-                  color: "text.primary", // You can change the color here
-                }}
-                aria-label="close"
-              >
-                <CloseIcon />
-              </IconButton>
+        <UploadModal
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          files={files}
+          setFiles={setFiles}
+          jobIds={jobIds}
+          selectedJob={selectedJob}
+          setSelectedJob={setSelectedJob}
+          handleUploadResumes={handleUploadResumes}
+        />
 
-              <Typography variant="h5" gutterBottom>
-                Upload Resumes
-              </Typography>
+        <Typography variant="h1" gutterBottom color="primary.main">
+          Applicants
+        </Typography>
 
-              {/* Job ID Dropdown */}
-              <FormControl fullWidth margin="normal">
-                <InputLabel id="job-id-select-label">Select Job ID</InputLabel>
-                <Select
-                  labelId="job-id-select-label"
-                  id="job-id-select"
-                  value={selectedJob}
-                  label="Select Job ID"
-                  onChange={handleJobChange}
-                >
-                  {jobIds.map((jobId) => (
-                    <MenuItem key={jobId} value={jobId}>
-                      {jobId}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth margin="normal">
-                <TextField
-                  fullWidth
-                  type="file"
-                  inputProps={{ multiple: true }}
-                  onChange={handleFileChange}
-                  sx={{ marginBottom: 2 }}
-                />
-              </FormControl>
-              <Button
-                variant="contained"
-                onClick={handleUploadResumes}
-                color="primary"
-              >
-                Upload Files
-              </Button>
-
-              {/* Display uploaded files with remove option */}
-              <Box mt={2}>
-                {files.length > 0 && (
-                  <Typography variant="body2" gutterBottom>
-                    Uploaded Files:
-                  </Typography>
-                )}
-                <ul>
-                  {files.map((file, index) => (
-                    <li
-                      key={index}
-                      style={{ display: "flex", alignItems: "center" }}
-                    >
-                      <Typography
-                        variant="body2"
-                        style={{
-                          flexGrow: 1,
-                          overflow: "hidden", // Ensure content doesn't overflow
-                          textOverflow: "ellipsis", // Apply ellipsis when text overflows
-                          whiteSpace: "nowrap", // Prevent wrapping
-                          display: "block", // Make sure it behaves like a block-level element for wrapping
-                          width: "100%",
-                        }}
-                      >
-                        {file.name}
-                      </Typography>
-                      <IconButton
-                        color="secondary"
-                        onClick={() => removeFile(index)}
-                        aria-label="remove file"
-                      >
-                        <CancelIcon />
-                      </IconButton>
-                    </li>
-                  ))}
-                </ul>
-              </Box>
-            </Box>
-          </Fade>
-        </Modal>
-
-        <Paper>
-          <Box
-            p={2}
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h2" gutterBottom color="primary.main">
+        <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
+          {/* Applicants Table */}
+          <Box>
+            <Typography variant="h5" gutterBottom color="black">
               {job === undefined ? (
                 "All Applicants"
               ) : (
@@ -331,16 +201,6 @@ const Applicants = () => {
                 </>
               )}
             </Typography>
-
-            {/* Button to open file upload modal */}
-            <Button
-              color="primary"
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setOpenModal(true)}
-            >
-              Upload Resumes
-            </Button>
           </Box>
 
           <TableContainer component={Paper}>
