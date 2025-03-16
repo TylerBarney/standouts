@@ -18,7 +18,7 @@ const Dashboard = () => {
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 8 }}>
         <Typography variant="h1" gutterBottom color="primary.main">
-          Welcome to <strong>StandOut</strong>
+          Welcome to <strong>Standout</strong>
         </Typography>
         <Typography variant="body1" paragraph color="text.secondary">
           Get started...

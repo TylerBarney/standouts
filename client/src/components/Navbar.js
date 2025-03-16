@@ -68,7 +68,7 @@ const Navbar = () => {
             duration: theme.transitions.duration.enteringScreen,
           }),
           overflowX: "hidden",
-          pl: 1,
+          pl: 0,
           pt: 2,
           pb: 2,
           height: "calc(100% - 16px)",
@@ -101,7 +101,7 @@ const Navbar = () => {
                 color: "primary.contrastText",
               }}
             >
-              StandOut
+              Standout
             </Typography>
           )}
 
@@ -158,7 +158,19 @@ const Navbar = () => {
                 >
                   {item.icon}
                 </ListItemIcon>
-                {open && <ListItemText primary={item.text} />}
+                {open && (
+                  <ListItemText 
+                    primary={item.text} 
+                    sx={{ 
+                      '& .MuiListItemText-primary': { 
+                        color: 
+                          location.pathname === item.path
+                          ? theme.palette.secondary.main
+                          : theme.palette.primary.contrastText, 
+                      } 
+                    }}
+                  />
+                )}
               </ListItemButton>
             </Tooltip>
           ))}
@@ -171,7 +183,7 @@ const Navbar = () => {
               variant="caption"
               sx={{ color: "rgba(255, 255, 255, 0.7)" }}
             >
-              &copy; {new Date().getFullYear()} My App
+              &copy; {new Date().getFullYear()} Standout
             </Typography>
           </Box>
         )}
