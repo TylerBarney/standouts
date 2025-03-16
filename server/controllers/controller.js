@@ -184,6 +184,7 @@ exports.getApplicants = async (req, res) => {
     const applicants = await Applicant.find({
       business_id: req.params.businessId,
     });
+    
     res.json(applicants);
   } catch (error) {
     logger.error("Error fetching applicants", error);

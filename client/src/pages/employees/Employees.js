@@ -25,6 +25,7 @@ import {
 } from "../../services/api";
 import UploadResumeModal from "./UploadResumeModal";
 import EmployeeFilter from "./EmployeeFilter";
+import { useAuth } from "../authentication/AuthContext";
 
 const Employees = () => {
   const [employees, setEmployees] = React.useState([]);
@@ -55,7 +56,7 @@ const Employees = () => {
     );
   });
 
-  const businessId = "67d0daded458795a794012ec"; // This would typically be the logged-in business's ID
+  const { businessId } = useAuth();
 
   React.useEffect(() => {
     const formatEmployees = (employees) => {
@@ -272,7 +273,7 @@ const Employees = () => {
                 ) : (
                   employees.map((employee, index) => (
                     <TableRow>
-                      <TableCell>{employee.id}</TableCell>
+                      <TableCell>{employee.id.substring(0, 8)}</TableCell>
                       <TableCell>{employee.name}</TableCell>
                       <TableCell>{employee.department}</TableCell>
                       <TableCell>{employee.position_level}</TableCell>
