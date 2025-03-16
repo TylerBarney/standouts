@@ -34,7 +34,7 @@ import {
   Cancel as CancelIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
-import { getApplicants, getJobOpenings, addApplicantAPI, deleteApplicantAPI } from "../../services/api";
+import { getApplicants, getJobOpenings, addApplicantAPI, deleteApplicantAPI, downloadApplicantResume } from "../../services/api";
 
 const Applicants = () => {
   const location = useLocation();
@@ -75,12 +75,12 @@ const Applicants = () => {
     files.forEach((file, index) => {
       // Simulated data (normally, this comes from the backend)
       const applicant = {
-        job_opening_id: selectedJob,
+        job_opening_id: selectedJob.id,
         compatibility: 0.8,
         name: file.name.replace(".pdf", ""),
         email: "fakeEmail123@gmail.com",
         business_id: "67d0daded458795a794012ec",
-        resume_pdf: file.name,
+        resume_pdf: file,
         department_id: selectedJob.department_id,
         position_level: selectedJob.position_level,
       };
@@ -183,28 +183,26 @@ const Applicants = () => {
     setJob(undefined);
   };
 
-  const downloadResume = (applicantName, job_opening_id) => {
+  const downloadResume = async (applicantId, applicantName) => {
     try {
-      // Replace space with underscore
+      // Get the PDF blob from API
+      const pdfBlob = await downloadApplicantResume(applicantId);
+      
+      // Replace space with underscore for the filename
       const name = applicantName.replace(/ /g, "_");
-
-      // Simulated byte array (normally, this comes from the backend)
-      const fakeByteArray = new Uint8Array([72, 101, 108, 108, 111]); // "Hello" in bytes
-      const blob = new Blob([fakeByteArray], { type: "application/pdf" });
-
-      // Create a link to trigger download
-      const url = URL.createObjectURL(blob);
+      
+      // Create a download link
+      const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `job${job_opening_id}_${name}_Resume.pdf`; // Set download filename
+      a.download = `${name}_Resume.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-
-      // Cleanup the object URL
+      
+      // Clean up
       URL.revokeObjectURL(url);
-
-      console.log("Resume download triggered.");
+      console.log("Resume download completed successfully.");
     } catch (error) {
       console.error("Error downloading resume:", error);
     }
@@ -436,7 +434,7 @@ const Applicants = () => {
                               <Button
                                 color="primary"
                                 onClick={() =>
-                                  downloadResume(applicant.name, applicant.job_opening_id)
+                                  downloadResume(applicant.id, applicant.name, applicant.job_opening_id)
                                 }
                               >
                                 <DownloadIcon />

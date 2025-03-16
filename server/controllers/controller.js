@@ -63,18 +63,37 @@ exports.getEmployees = async (req, res) => {
 
 exports.addEmployee = async (req, res) => {
   try {
-    const { name, business_id, resume_pdf, department, position_level } =
+    const { name, business_id, department, position_level } =
       req.body;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: "Resume PDF is required" });
+    }
+
+    let resume_pdf, resume_pdf_filename;
+
+    if (req.file) {
+      resume_pdf = req.file.buffer;
+      resume_pdf_filename = req.file.originalname;
+    }
+
     const newEmployee = new Employee({
       name,
       business_id,
       resume_pdf,
+      resume_pdf_filename,
       department,
       position_level,
     });
 
     const savedEmployee = await newEmployee.save();
-    res.status(201).json(savedEmployee);
+
+    // Don't return the resume_pdf or resume_pdf_filename in the response
+    const responseEmployee = savedEmployee.toObject();
+    delete responseEmployee.resume_pdf;
+    delete responseEmployee.resume_pdf_filename;
+
+    res.status(201).json(responseEmployee);
   } catch (error) {
     logger.error("Error adding employee", error);
     res.status(500).json({ error: "Server error" });
@@ -90,6 +109,20 @@ exports.deleteEmployee = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+exports.downloadEmployeeResume = async (req, res) => {
+  try {
+    console.log(req.params.employeeId)
+    const employee = await Employee.findById(req.params.employeeId);
+    res.setHeader('Content-Type', 'employee/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${employee.resume_pdf_filename}"`);
+    res.send(employee.resume_pdf);
+  } catch (error) {
+    logger.error('Error downloading employee resume', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 
 // Job Openings
 exports.getJobOpenings = async (req, res) => {
@@ -160,24 +193,54 @@ exports.getApplicants = async (req, res) => {
 
 exports.addApplicant = async (req, res) => {
   try {
-    const { name, email, business_id, job_opening_id, resume_pdf, department_id, position_level, compatibility } = req.body;
-    
+    const { name, email, business_id, job_opening_id, department_id, position_level, compatibility } = req.body;
+    if (!req.file) {
+      return res.status(400).json({ error: "Resume PDF is required" });
+    }
+
+    let resume_pdf, resume_pdf_filename;
+
+    if (req.file) {
+      resume_pdf = req.file.buffer;
+      resume_pdf_filename = req.file.originalname;
+    }
+    console.log(req.body)
+
     const newApplicant = new Applicant({
       name,
       email,
       business_id,
       job_opening_id,
       resume_pdf,
+      resume_pdf_filename,
       department_id,
       position_level,
       compatibility: compatibility || 0
     });
 
     const savedApplicant = await newApplicant.save();
-    res.status(201).json(savedApplicant);
+
+    // Don't return the resume_pdf or resume_pdf_filename in the response
+    const responseApplicant = savedApplicant.toObject();
+    delete responseApplicant.resume_pdf;
+    delete responseApplicant.resume_pdf_filename;
+
+    res.status(201).json(responseApplicant);
   } catch (error) {
     logger.error("Error adding applicant", error);
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.downloadApplicantResume = async (req, res) => {
+  try {
+    const applicant = await Applicant.findById(req.params.applicantId);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${applicant.resume_pdf_filename}"`);
+    res.send(applicant.resume_pdf);
+  } catch (error) {
+    logger.error('Error downloading applicant resume', error);
+    res.status(500).json({ error: 'Server error' });
   }
 };
 

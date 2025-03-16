@@ -32,7 +32,11 @@ const EmployeeSchema = new mongoose.Schema({
     required: true
   },
   resume_pdf: {
-    type: String,  // This will store the path or URL to the PDF file
+    type: Buffer,
+    required: true
+  },
+  resume_pdf_filename: {
+    type: String,
     required: true
   },
   department: {
@@ -65,6 +69,10 @@ const ApplicantSchema = new mongoose.Schema({
     required: true
   },
   resume_pdf: {
+    type: Buffer,
+    required: true
+  },
+  resume_pdf_filename: {
     type: String,
     required: true
   },
