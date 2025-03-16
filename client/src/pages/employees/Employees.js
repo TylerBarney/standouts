@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Container,
   Paper,
@@ -24,11 +24,36 @@ import {
   downloadEmployeeResume,
 } from "../../services/api";
 import UploadResumeModal from "./UploadResumeModal";
+import EmployeeFilter from "./EmployeeFilter";
 
 const Employees = () => {
   const [employees, setEmployees] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+
+  const [filters, setFilters] = useState({
+    name: "",
+    id: "",
+    department: "",
+    position_level: "",
+  });
+
+  // Extract unique department and level options from employees
+  const departments = [...new Set(employees.map((e) => e.department))];
+  const levels = [...new Set(employees.map((e) => e.position_level))];
+
+  // Filter employees based on the selected filters
+  const filteredEmployees = employees.filter((employee) => {
+    return (
+      (filters.name === "" ||
+        employee.name.toLowerCase().includes(filters.name.toLowerCase())) &&
+      (filters.id === "" || employee.id.includes(filters.id)) &&
+      (filters.department === "" ||
+        employee.department === filters.department) &&
+      (filters.position_level === "" ||
+        employee.position_level === filters.position_level)
+    );
+  });
 
   const businessId = "67d0daded458795a794012ec"; // This would typically be the logged-in business's ID
 
@@ -162,7 +187,11 @@ const Employees = () => {
 
   return (
     <Container>
-      <Box my={4}>
+      <Box sx={{ mt: 4, mb: 8 }}>
+        <Typography variant="h1" gutterBottom color="primary.main">
+          Employees
+        </Typography>
+
         {/* Modal for file upload */}
         <UploadResumeModal
           openModal={openModal}
@@ -177,15 +206,23 @@ const Employees = () => {
           setOpenModal={setOpenModal}
         />
 
-        <Paper>
+        <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
+          {/* Employee Filter Section */}
+          <EmployeeFilter
+            filters={filters}
+            setFilters={setFilters}
+            departments={departments}
+            levels={levels}
+          />
+
           <Box
             p={2}
             display="flex"
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="h2" gutterBottom color="primary.main">
-              Employee Resumes
+            <Typography variant="h5" gutterBottom color="black">
+              Resumes
             </Typography>
 
             {/* Button to open file upload modal */}
