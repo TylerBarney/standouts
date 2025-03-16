@@ -176,7 +176,7 @@ const Jobs = () => {
                 ) : (
                   jobs.map((job, index) => (
                     <TableRow key={index}>
-                      <TableCell>{job.id}</TableCell>
+                      <TableCell>{job.id.substring(0, 8)}</TableCell>
                       <TableCell>{job.title}</TableCell>
                       <TableCell>{job.description}</TableCell>
                       <TableCell>{job.department_id}</TableCell>

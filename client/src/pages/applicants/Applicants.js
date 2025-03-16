@@ -252,7 +252,7 @@ const Applicants = () => {
                   <Button color="primary" onClick={() => setJobToUndefined()}>
                     <KeyboardBackspaceIcon />
                   </Button>
-                  Job {job.id}: {job.title}
+                  Job {job.id.substring(0, 8)}: {job.title}
                 </>
               )}
             </Typography>
@@ -320,7 +320,7 @@ const Applicants = () => {
                               </IconButton>
                             </TableCell>
                             <TableCell>{applicant.name}</TableCell>
-                            <TableCell>{applicant.job_opening_id}</TableCell>
+                            <TableCell>{applicant.job_opening_id.substring(0, 8)}</TableCell>
                             <TableCell>
                               {Math.floor(applicant.compatibility * 100)}%
                             </TableCell>

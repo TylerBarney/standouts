@@ -86,7 +86,7 @@ const UploadModal = ({
             >
               {job_openings.map((job_opening) => (
                 <MenuItem key={job_opening.id} value={job_opening}>
-                  {job_opening.id}
+                  {job_opening.id.substring(0, 8) + " - " + job_opening.title}
                 </MenuItem>
               ))}
             </Select>

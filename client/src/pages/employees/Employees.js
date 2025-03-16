@@ -380,7 +380,7 @@ const Employees = () => {
                 ) : (
                   employees.map((employee, index) => (
                     <TableRow>
-                      <TableCell>{employee.id}</TableCell>
+                      <TableCell>{employee.id.substring(0, 8)}</TableCell>
                       <TableCell>{employee.name}</TableCell>
                       <TableCell>{employee.department}</TableCell>
                       <TableCell>{employee.position_level}</TableCell>
