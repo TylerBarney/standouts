@@ -26,16 +26,6 @@ import {
 } from "../../services/api";
 const Jobs = () => {
   const navigate = useNavigate();
-  const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
-  const jobDepartments = [
-    "Engineering",
-    "Marketing",
-    "HR",
-    "Sales",
-    "Finance",
-    "BI",
-    "Internship",
-  ];
 
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);

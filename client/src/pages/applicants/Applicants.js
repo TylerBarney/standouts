@@ -244,7 +244,7 @@ const Applicants = () => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="h2" gutterBottom color="primary.main">
+            <Typography variant="h5" gutterBottom color="black">
               {job === undefined ? (
                 "All Applicants"
               ) : (
