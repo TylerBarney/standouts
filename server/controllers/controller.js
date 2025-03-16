@@ -11,6 +11,7 @@ const {
   Applicant,
 } = require("../models/models.js");
 const logger = require("../utils/logger");
+const { extractNameFromResume, extractEmailFromResume } = require("../utils/pdfParser");
 
 // Controller methods
 exports.getBusinessInfo = async (req, res) => {
@@ -63,7 +64,7 @@ exports.getEmployees = async (req, res) => {
 
 exports.addEmployee = async (req, res) => {
   try {
-    const { name, business_id, department, position_level } =
+    const { business_id, department, position_level } =
       req.body;
     
     if (!req.file) {
@@ -72,10 +73,9 @@ exports.addEmployee = async (req, res) => {
 
     let resume_pdf, resume_pdf_filename;
 
-    if (req.file) {
-      resume_pdf = req.file.buffer;
-      resume_pdf_filename = req.file.originalname;
-    }
+    resume_pdf = req.file.buffer;
+    const name = await extractNameFromResume(resume_pdf);
+    resume_pdf_filename = name + "_Resume.pdf";
 
     const newEmployee = new Employee({
       name,
@@ -193,18 +193,18 @@ exports.getApplicants = async (req, res) => {
 
 exports.addApplicant = async (req, res) => {
   try {
-    const { name, email, business_id, job_opening_id, department_id, position_level, compatibility } = req.body;
+    const { business_id, job_opening_id, department_id, position_level, compatibility } = req.body;
     if (!req.file) {
       return res.status(400).json({ error: "Resume PDF is required" });
     }
 
     let resume_pdf, resume_pdf_filename;
 
-    if (req.file) {
-      resume_pdf = req.file.buffer;
-      resume_pdf_filename = req.file.originalname;
-    }
-    console.log(req.body)
+    resume_pdf = req.file.buffer;
+    const name = await extractNameFromResume(resume_pdf);
+    resume_pdf_filename = name + "_Resume.pdf";
+
+    const email = await extractEmailFromResume(resume_pdf);
 
     const newApplicant = new Applicant({
       name,
