@@ -24,13 +24,13 @@ import {
   downloadEmployeeResume,
 } from "../../services/api";
 import UploadResumeModal from "./UploadResumeModal";
-
+import { useAuth } from "../authentication/AuthContext";
 const Employees = () => {
   const [employees, setEmployees] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
 
-  const businessId = "67d0daded458795a794012ec"; // This would typically be the logged-in business's ID
+  const { businessId } = useAuth();
 
   React.useEffect(() => {
     const formatEmployees = (employees) => {

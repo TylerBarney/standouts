@@ -24,6 +24,8 @@ import {
   addJobOpening,
   deleteJobOpening,
 } from "../../services/api";
+import { useAuth } from "../authentication/AuthContext";
+
 const Jobs = () => {
   const navigate = useNavigate();
 
@@ -31,7 +33,7 @@ const Jobs = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const businessId = "67d0daded458795a794012ec"; // This would typically be the logged-in business's ID
+  const { businessId } = useAuth();
 
   useEffect(() => {
     const formatJobs = (jobs) => {

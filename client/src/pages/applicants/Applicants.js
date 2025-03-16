@@ -32,7 +32,7 @@ import {
   deleteApplicantAPI,
   downloadApplicantResume,
 } from "../../services/api";
-
+import { useAuth } from "../authentication/AuthContext";
 const Applicants = () => {
   const location = useLocation();
 
@@ -44,6 +44,7 @@ const Applicants = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [files, setFiles] = React.useState([]);
   const [selectedJob, setSelectedJob] = React.useState("");
+  const { businessId } = useAuth();
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -74,7 +75,7 @@ const Applicants = () => {
       const applicant = {
         job_opening_id: selectedJob.id,
         compatibility: 0.8,
-        business_id: "67d0daded458795a794012ec",
+        business_id: businessId,
         resume_pdf: file,
         department_id: selectedJob.department_id,
         position_level: selectedJob.position_level,
@@ -100,9 +101,6 @@ const Applicants = () => {
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Temporary business ID - in a real app, this would come from auth context or similar
-  const businessId = "67d0daded458795a794012ec"; // This would typically be the logged-in business's ID
 
   // Fetch applicants when component mounts
   useEffect(() => {
