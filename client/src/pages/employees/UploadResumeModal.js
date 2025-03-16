@@ -2,45 +2,50 @@ import React from "react";
 import {
   Box,
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Modal,
-  Select,
-  TextField,
   Typography,
   IconButton,
+  Modal,
   Fade,
   Backdrop,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { Cancel as CancelIcon, Close as CloseIcon } from "@mui/icons-material";
 
-const UploadModal = ({
+const UploadResumeModal = ({
   openModal,
-  setOpenModal,
+  selectedLevel,
+  handleLevelChange,
+  selectedDepartment,
+  handleDepartmentChange,
+  handleFileChange,
+  removeFile,
   files,
-  setFiles,
-  job_openings,
-  selectedJob,
   handleUploadResumes,
-  handleJobChange,
+  setOpenModal,
 }) => {
-  const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    setFiles(selectedFiles);
-  };
-
-  const removeFile = (index) => {
-    setFiles(files.filter((_, i) => i !== index));
-  };
-
+  const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
+  const jobDepartments = [
+    "Engineering",
+    "Marketing",
+    "HR",
+    "Sales",
+    "Finance",
+    "BI",
+    "Internship",
+  ];
   return (
     <Modal
       open={openModal}
       onClose={() => setOpenModal(false)}
       closeAfterTransition
       BackdropComponent={Backdrop}
-      BackdropProps={{ timeout: 500 }}
+      BackdropProps={{
+        timeout: 500,
+      }}
     >
       <Fade in={openModal}>
         <Box
@@ -51,7 +56,7 @@ const UploadModal = ({
             transform: "translate(-50%, -50%)",
             width: 400,
             bgcolor: "background.paper",
-            border: "2px solid #000",
+            border: "2px solid #222",
             boxShadow: 24,
             p: 4,
           }}
@@ -63,7 +68,7 @@ const UploadModal = ({
               position: "absolute",
               top: 8,
               right: 8,
-              color: "text.primary",
+              color: "text.primary", // You can change the color here
             }}
             aria-label="close"
           >
@@ -74,25 +79,42 @@ const UploadModal = ({
             Upload Resumes
           </Typography>
 
-          {/* Job ID Dropdown */}
+          {/* Level Dropdown */}
           <FormControl fullWidth margin="normal">
-            <InputLabel id="job-id-select-label">Select Job ID</InputLabel>
+            <InputLabel id="level-select">Select Level</InputLabel>
             <Select
-              labelId="job-id-select-label"
-              id="job-id-select"
-              value={selectedJob}
-              label="Select Job ID"
-              onChange={handleJobChange}
+              labelId="level-select"
+              id="level-select"
+              value={selectedLevel}
+              label="Select Level"
+              onChange={handleLevelChange}
             >
-              {job_openings.map((job_opening) => (
-                <MenuItem key={job_opening.id} value={job_opening}>
-                  {job_opening.id}
+              {jobLevels.map((level) => (
+                <MenuItem key={level} value={level}>
+                  {level}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          {/* File Upload */}
+          {/* Department Dropdown */}
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="department-select">Select Department</InputLabel>
+            <Select
+              labelId="department-select"
+              id="department-select"
+              value={selectedDepartment}
+              label="Select Department"
+              onChange={handleDepartmentChange}
+            >
+              {jobDepartments.map((department) => (
+                <MenuItem key={department} value={department}>
+                  {department}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <FormControl fullWidth margin="normal">
             <TextField
               fullWidth
@@ -125,12 +147,12 @@ const UploadModal = ({
                 >
                   <Typography
                     variant="body2"
-                    sx={{
+                    style={{
                       flexGrow: 1,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      display: "block",
+                      overflow: "hidden", // Ensure content doesn't overflow
+                      textOverflow: "ellipsis", // Apply ellipsis when text overflows
+                      whiteSpace: "nowrap", // Prevent wrapping
+                      display: "block", // Make sure it behaves like a block-level element for wrapping
                       width: "100%",
                     }}
                   >
@@ -153,4 +175,4 @@ const UploadModal = ({
   );
 };
 
-export default UploadModal;
+export default UploadResumeModal;
