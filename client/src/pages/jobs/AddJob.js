@@ -9,7 +9,18 @@ import {
   Grid,
 } from "@mui/material";
 
-const AddJob = ({ newJob, jobDepartments, jobLevels, addJob, setNewJob }) => {
+const AddJob = ({ newJob, addJob, setNewJob }) => {
+  const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
+  const jobDepartments = [
+    "Engineering",
+    "Marketing",
+    "HR",
+    "Sales",
+    "Finance",
+    "BI",
+    "Internship",
+  ];
+
   return (
     <>
       <Typography variant="h5" gutterBottom color="black">

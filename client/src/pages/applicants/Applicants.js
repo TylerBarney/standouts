@@ -24,7 +24,7 @@ import {
   KeyboardBackspace as KeyboardBackspaceIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
-import UploadModal from "./UploadModal";
+import UploadResumeModal from "./UploadResumeModal";
 import {
   getApplicants,
   getJobOpenings,
@@ -224,7 +224,7 @@ const Applicants = () => {
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 8 }}>
         {/* Modal for file upload */}
-        <UploadModal
+        <UploadResumeModal
           openModal={openModal}
           setOpenModal={setOpenModal}
           files={files}
@@ -244,7 +244,7 @@ const Applicants = () => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="h2" gutterBottom color="primary.main">
+            <Typography variant="h5" gutterBottom color="black">
               {job === undefined ? (
                 "All Applicants"
               ) : (

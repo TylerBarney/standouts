@@ -51,11 +51,6 @@ const Dashboard = () => {
                     Get Started
                   </Button>
                 </Grid>
-                {/* <Grid item>
-                  <Button variant="contained" color="secondary">
-                    Learn More
-                  </Button>
-                </Grid> */}
               </Grid>
             </Paper>
           </Grid>
@@ -78,11 +73,6 @@ const Dashboard = () => {
                 compatilibites are scored.
               </Typography>
               <Grid container spacing={2} sx={{ mt: 3 }}>
-                {/* <Grid item>
-                  <Button variant="contained" color="primary">
-                    Get Started
-                  </Button>
-                </Grid> */}
                 <Grid item>
                   <Button
                     variant="contained"
@@ -122,11 +112,6 @@ const Dashboard = () => {
                     Get Started
                   </Button>
                 </Grid>
-                {/* <Grid item>
-                  <Button variant="contained" color="secondary">
-                    Learn More
-                  </Button>
-                </Grid> */}
               </Grid>
             </Paper>
           </Grid>
