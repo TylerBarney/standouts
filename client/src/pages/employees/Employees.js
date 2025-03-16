@@ -32,6 +32,7 @@ import {
   getEmployees,
   addEmployeeAPI,
   deleteEmployeeAPI,
+  downloadEmployeeResume,
 } from "../../services/api";
 
 const Employees = () => {
@@ -113,12 +114,11 @@ const Employees = () => {
   const handleUploadResumes = async () => {
     // make the API call to upload the files to the database
     const uploadPromises = files.map((file) => {
-      // Simulated data (normally, this comes from the backend)
       const resume = {
         department: selectedDepartment,
         position_level: selectedLevel,
         name: file.name.replace(".pdf", ""),
-        resume_pdf: file.name,
+        resume_pdf: file,
         business_id: businessId,
       };
 
@@ -157,28 +157,26 @@ const Employees = () => {
     }
   };
 
-  const downloadResume = (employeeName) => {
+  const downloadResume = async (employeeId, employeeName) => {
     try {
-      // Replace space with underscore
+      // Get the PDF blob from API
+      const pdfBlob = await downloadEmployeeResume(employeeId);
+      
+      // Replace space with underscore for the filename
       const name = employeeName.replace(/ /g, "_");
-
-      // Simulated byte array (normally, this comes from the backend)
-      const fakeByteArray = new Uint8Array([72, 101, 108, 108, 111]); // "Hello" in bytes
-      const blob = new Blob([fakeByteArray], { type: "application/pdf" });
-
-      // Create a link to trigger download
-      const url = URL.createObjectURL(blob);
+      
+      // Create a download link
+      const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `employee_${name}_Resume.pdf`; // Set download filename
+      a.download = `${name}_Resume.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-
-      // Cleanup the object URL
+      
+      // Clean up
       URL.revokeObjectURL(url);
-
-      console.log("Resume download triggered.");
+      console.log("Resume download completed successfully.");
     } catch (error) {
       console.error("Error downloading resume:", error);
     }
@@ -390,7 +388,7 @@ const Employees = () => {
                       <TableCell>
                         <Button
                           color="primary"
-                          onClick={() => downloadResume(employee.name)}
+                          onClick={() => downloadResume(employee.id, employee.name)}
                         >
                           <DownloadIcon />
                         </Button>

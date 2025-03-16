@@ -9,6 +9,7 @@ const api = axios.create({
   },
 });
 
+
 // Example API methods
 export const testApi = async () => {
   try {
@@ -95,7 +96,31 @@ export const getApplicants = async (businessId) => {
 export const addApplicantAPI = async (applicantData) => {
   console.log("Adding applicant:", applicantData);
   try {
-    const response = await api.post("/applicants", applicantData);
+    // Create a FormData object for file uploads
+    const formData = new FormData();
+    
+    // Check if the resume_pdf is actually a File object
+    if (!(applicantData.resume_pdf instanceof File)) {
+      console.error("resume_pdf is not a File object:", applicantData.resume_pdf);
+      throw new Error("resume_pdf must be a File object");
+    }
+    
+    // Add the resume file with the field name the server expects
+    formData.append('resume_pdf', applicantData.resume_pdf);
+    
+    // Add all other applicant data as form fields
+    Object.keys(applicantData).forEach(key => {
+      if (key !== 'resume_pdf') {
+        formData.append(key, applicantData[key]);
+      }
+    });
+    
+    // Need to send multipart/form-data to get file upload to work
+    const response = await api.post("/applicants", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error adding applicant:", error);
@@ -126,7 +151,31 @@ export const getEmployees = async (businessId) => {
 
 export const addEmployeeAPI = async (employeeData) => {
   try {
-    const response = await api.post("/employees", employeeData);
+    // Create a FormData object for file uploads
+    const formData = new FormData();
+    
+    // Check if the resume_pdf is actually a File object
+    if (!(employeeData.resume_pdf instanceof File)) {
+      console.error("resume_pdf is not a File object:", employeeData.resume_pdf);
+      throw new Error("resume_pdf must be a File object");
+    }
+    
+    // Add the resume file with the field name the server expects
+    formData.append('resume_pdf', employeeData.resume_pdf);
+    
+    // Add all other applicant data as form fields
+    Object.keys(employeeData).forEach(key => {
+      if (key !== 'resume_pdf') {
+        formData.append(key, employeeData[key]);
+      }
+    });
+    
+    // Need to send multipart/form-data to get file upload to work
+    const response = await api.post("/employees", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error adding employee:", error);
@@ -140,6 +189,30 @@ export const deleteEmployeeAPI = async (employeeId) => {
     return response.data;
   } catch (error) {
     console.error("Error deleting employee:", error);
+    throw error;
+  }
+};
+
+export const downloadApplicantResume = async (applicantId) => {
+  try {
+    const response = await api.get(`/applicants/${applicantId}/resume`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error downloading applicant resume:", error);
+    throw error;
+  }
+};
+
+export const downloadEmployeeResume = async (employeeId) => {
+  try {
+    const response = await api.get(`/employees/${employeeId}/resume`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error downloading employee resume:", error);
     throw error;
   }
 };

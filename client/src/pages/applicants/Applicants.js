@@ -22,6 +22,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   Download as DownloadIcon,
   KeyboardBackspace as KeyboardBackspaceIcon,
+  Add as AddIcon,
 } from "@mui/icons-material";
 import UploadModal from "./UploadModal";
 import {
@@ -29,6 +30,7 @@ import {
   getJobOpenings,
   addApplicantAPI,
   deleteApplicantAPI,
+  downloadApplicantResume,
 } from "../../services/api";
 
 const Applicants = () => {
@@ -70,12 +72,12 @@ const Applicants = () => {
     files.forEach((file, index) => {
       // Simulated data (normally, this comes from the backend)
       const applicant = {
-        job_opening_id: selectedJob,
+        job_opening_id: selectedJob.id,
         compatibility: 0.8,
         name: file.name.replace(".pdf", ""),
         email: "fakeEmail123@gmail.com",
         business_id: "67d0daded458795a794012ec",
-        resume_pdf: file.name,
+        resume_pdf: file,
         department_id: selectedJob.department_id,
         position_level: selectedJob.position_level,
       };
@@ -91,6 +93,10 @@ const Applicants = () => {
     setFiles([]);
     // Clear the selected job after upload
     setSelectedJob("");
+  };
+
+  const handleJobChange = (e) => {
+    setSelectedJob(e.target.value);
   };
 
   const [applicants, setApplicants] = useState([]);
@@ -174,28 +180,26 @@ const Applicants = () => {
     setJob(undefined);
   };
 
-  const downloadResume = (applicantName, job_opening_id) => {
+  const downloadResume = async (applicantId, applicantName) => {
     try {
-      // Replace space with underscore
+      // Get the PDF blob from API
+      const pdfBlob = await downloadApplicantResume(applicantId);
+
+      // Replace space with underscore for the filename
       const name = applicantName.replace(/ /g, "_");
 
-      // Simulated byte array (normally, this comes from the backend)
-      const fakeByteArray = new Uint8Array([72, 101, 108, 108, 111]); // "Hello" in bytes
-      const blob = new Blob([fakeByteArray], { type: "application/pdf" });
-
-      // Create a link to trigger download
-      const url = URL.createObjectURL(blob);
+      // Create a download link
+      const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `job${job_opening_id}_${name}_Resume.pdf`; // Set download filename
+      a.download = `${name}_Resume.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
 
-      // Cleanup the object URL
+      // Clean up
       URL.revokeObjectURL(url);
-
-      console.log("Resume download triggered.");
+      console.log("Resume download completed successfully.");
     } catch (error) {
       console.error("Error downloading resume:", error);
     }
@@ -235,84 +239,6 @@ const Applicants = () => {
         <Typography variant="h1" gutterBottom color="primary.main">
           Applicants
         </Typography>
-        {/* <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
-          {/* Applicants Table */}
-        {/* <Box>
-            <Typography variant="h5" gutterBottom color="black">
-              {/* Job ID Dropdown */}
-        {/* <FormControl fullWidth margin="normal">
-                <InputLabel id="job-id-select-label">Select Job ID</InputLabel>
-                <Select
-                  labelId="job-id-select-label"
-                  id="job-id-select"
-                  value={selectedJob}
-                  label="Select Job ID"
-                  onChange={handleJobChange}
-                >
-                  {job_openings.map((job_opening) => (
-                    <MenuItem key={job_opening.id} value={job_opening}>
-                      {job_opening.id}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth margin="normal">
-                <TextField
-                  fullWidth
-                  type="file"
-                  inputProps={{ multiple: true }}
-                  onChange={handleFileChange}
-                  sx={{ marginBottom: 2 }}
-                />
-              </FormControl>
-              <Button
-                variant="contained"
-                onClick={handleUploadResumes}
-                color="primary"
-              >
-                Upload Files
-              </Button> */}
-        {/* Display uploaded files with remove option */}
-        {/* <Box mt={2}>
-                {files.length > 0 && (
-                  <Typography variant="body2" gutterBottom>
-                    Uploaded Files:
-                  </Typography>
-                )}
-                <ul>
-                  {files.map((file, index) => (
-                    <li
-                      key={index}
-                      style={{ display: "flex", alignItems: "center" }}
-                    >
-                      <Typography
-                        variant="body2"
-                        style={{
-                          flexGrow: 1,
-                          overflow: "hidden", // Ensure content doesn't overflow
-                          textOverflow: "ellipsis", // Apply ellipsis when text overflows
-                          whiteSpace: "nowrap", // Prevent wrapping
-                          display: "block", // Make sure it behaves like a block-level element for wrapping
-                          width: "100%",
-                        }}
-                      >
-                        {file.name}
-                      </Typography>
-                      <IconButton
-                        color="secondary"
-                        onClick={() => removeFile(index)}
-                        aria-label="remove file"
-                      >
-                        <CancelIcon />
-                      </IconButton>
-                    </li>
-                  ))}
-                </ul>
-              </Box>
-            </Box>
-          </Fade>
-        </Modal> */}
         <Paper>
           <Box
             p={2}
@@ -332,6 +258,16 @@ const Applicants = () => {
                 </>
               )}
             </Typography>
+
+            {/* Button to open file upload modal */}
+            <Button
+              color="primary"
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenModal(true)}
+            >
+              Upload Resumes
+            </Button>
           </Box>
 
           <TableContainer component={Paper}>
@@ -395,6 +331,7 @@ const Applicants = () => {
                                 color="primary"
                                 onClick={() =>
                                   downloadResume(
+                                    applicant.id,
                                     applicant.name,
                                     applicant.job_opening_id
                                   )
