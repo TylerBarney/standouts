@@ -23,9 +23,13 @@ import {
   Download as DownloadIcon,
   KeyboardBackspace as KeyboardBackspaceIcon,
 } from "@mui/icons-material";
-import { getApplicants } from "../../services/api";
 import UploadModal from "./UploadModal";
-import { getApplicants, getJobOpenings, addApplicantAPI, deleteApplicantAPI } from "../../services/api";
+import {
+  getApplicants,
+  getJobOpenings,
+  addApplicantAPI,
+  deleteApplicantAPI,
+} from "../../services/api";
 
 const Applicants = () => {
   const location = useLocation();
@@ -112,7 +116,7 @@ const Applicants = () => {
         };
       });
     };
-    
+
     const fetchApplicants = async () => {
       try {
         setLoading(true);
@@ -134,7 +138,7 @@ const Applicants = () => {
       try {
         const data = await getJobOpenings(businessId);
         // Add IDs to the objects
-        data.forEach(job => job.id = job._id);
+        data.forEach((job) => (job.id = job._id));
         // Then set the entire array
         setJobOpenings(data);
       } catch (err) {
@@ -223,22 +227,20 @@ const Applicants = () => {
           setOpenModal={setOpenModal}
           files={files}
           setFiles={setFiles}
-          jobIds={jobIds}
+          job_openings={job_openings}
           selectedJob={selectedJob}
-          setSelectedJob={setSelectedJob}
           handleUploadResumes={handleUploadResumes}
+          handleJobChange={handleJobChange}
         />
-
         <Typography variant="h1" gutterBottom color="primary.main">
           Applicants
         </Typography>
-
-        <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
+        {/* <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
           {/* Applicants Table */}
-          <Box>
+        {/* <Box>
             <Typography variant="h5" gutterBottom color="black">
               {/* Job ID Dropdown */}
-              <FormControl fullWidth margin="normal">
+        {/* <FormControl fullWidth margin="normal">
                 <InputLabel id="job-id-select-label">Select Job ID</InputLabel>
                 <Select
                   labelId="job-id-select-label"
@@ -270,10 +272,9 @@ const Applicants = () => {
                 color="primary"
               >
                 Upload Files
-              </Button>
-
-              {/* Display uploaded files with remove option */}
-              <Box mt={2}>
+              </Button> */}
+        {/* Display uploaded files with remove option */}
+        {/* <Box mt={2}>
                 {files.length > 0 && (
                   <Typography variant="body2" gutterBottom>
                     Uploaded Files:
@@ -311,8 +312,7 @@ const Applicants = () => {
               </Box>
             </Box>
           </Fade>
-        </Modal>
-
+        </Modal> */}
         <Paper>
           <Box
             p={2}
@@ -369,7 +369,10 @@ const Applicants = () => {
                   </TableRow>
                 ) : (
                   applicants.map((applicant, index) => {
-                    if (job === undefined || applicant.job_opening_id === String(job.id)) {
+                    if (
+                      job === undefined ||
+                      applicant.job_opening_id === String(job.id)
+                    ) {
                       return (
                         <React.Fragment key={index}>
                           <TableRow>
@@ -391,7 +394,10 @@ const Applicants = () => {
                               <Button
                                 color="primary"
                                 onClick={() =>
-                                  downloadResume(applicant.name, applicant.job_opening_id)
+                                  downloadResume(
+                                    applicant.name,
+                                    applicant.job_opening_id
+                                  )
                                 }
                               >
                                 <DownloadIcon />

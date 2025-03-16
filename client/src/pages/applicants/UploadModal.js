@@ -20,10 +20,10 @@ const UploadModal = ({
   setOpenModal,
   files,
   setFiles,
-  jobIds,
+  job_openings,
   selectedJob,
-  setSelectedJob,
   handleUploadResumes,
+  handleJobChange,
 }) => {
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -82,11 +82,11 @@ const UploadModal = ({
               id="job-id-select"
               value={selectedJob}
               label="Select Job ID"
-              onChange={(e) => setSelectedJob(e.target.value)}
+              onChange={handleJobChange}
             >
-              {jobIds.map((jobId) => (
-                <MenuItem key={jobId} value={jobId}>
-                  {jobId}
+              {job_openings.map((job_opening) => (
+                <MenuItem key={job_opening.id} value={job_opening}>
+                  {job_opening.id}
                 </MenuItem>
               ))}
             </Select>
