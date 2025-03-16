@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Form, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
   Paper,
@@ -12,11 +12,7 @@ import {
   TableHead,
   TableRow,
   Button,
-  TextField,
   Typography,
-  Select,
-  MenuItem,
-  Grid,
 } from "@mui/material";
 import {
   PeopleAlt as ApplicantsIcon,
@@ -128,13 +124,7 @@ const Jobs = () => {
           Job Openings
         </Typography>
         <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
-          <AddJob
-            newJob={newJob}
-            jobDepartments={jobDepartments}
-            jobLevels={jobLevels}
-            addJob={addJob}
-            setNewJob={setNewJob}
-          />
+          <AddJob newJob={newJob} addJob={addJob} setNewJob={setNewJob} />
 
           <Typography variant="h5" gutterBottom color="black">
             View Current Jobs
