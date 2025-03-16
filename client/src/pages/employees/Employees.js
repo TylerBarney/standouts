@@ -117,7 +117,6 @@ const Employees = () => {
       const resume = {
         department: selectedDepartment,
         position_level: selectedLevel,
-        name: file.name.replace(".pdf", ""),
         resume_pdf: file,
         business_id: businessId,
       };
