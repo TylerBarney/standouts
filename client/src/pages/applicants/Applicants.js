@@ -77,7 +77,6 @@ const Applicants = () => {
       const applicant = {
         job_opening_id: selectedJob.id,
         compatibility: 0.8,
-        email: "fakeEmail123@gmail.com",
         business_id: "67d0daded458795a794012ec",
         resume_pdf: file,
         department_id: selectedJob.department_id,

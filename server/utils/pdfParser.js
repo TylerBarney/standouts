@@ -61,7 +61,30 @@ async function extractNameFromResume(pdfBuffer) {
       return "John Doe";
     }
   }
+
+  async function extractEmailFromResume(pdfBuffer) {
+    try {
+        // Parse the PDF
+        const pdfData = await pdfParse(pdfBuffer)
+        const text = pdfData.text
+
+        //regex to find email
+        const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi
+        const emailMatch = text.match(emailRegex)
+
+        if (emailMatch && emailMatch.length > 0) {
+            return emailMatch[0]
+        }
+
+        // if no email is found,
+        return "john.doe@example.com"
+    } catch (error) {
+        logger.error('Error extracting email from resume:', error);
+        return "john.doe@example.com"
+    }
+  }
   
   module.exports = {
-    extractNameFromResume
+    extractNameFromResume,
+    extractEmailFromResume
   }; 
