@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Container,
   Paper,
@@ -15,6 +15,15 @@ import {
   Collapse,
   IconButton,
   CircularProgress,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
+  Divider,
+  Slider,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -23,6 +32,10 @@ import {
   Download as DownloadIcon,
   KeyboardBackspace as KeyboardBackspaceIcon,
   Add as AddIcon,
+  FilterList as FilterIcon,
+  Search as SearchIcon,
+  Clear as ClearIcon,
+  Percent as PercentIcon,
 } from "@mui/icons-material";
 import UploadResumeModal from "./UploadResumeModal";
 import {
@@ -33,18 +46,26 @@ import {
   downloadApplicantResume,
 } from "../../services/api";
 import { useAuth } from "../authentication/AuthContext";
+
 const Applicants = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [job_openings, setJobOpenings] = useState([]);
+  const [job, setJob] = useState(location.state?.job || undefined);
+  const [expandedRows, setExpandedRows] = useState({});
 
-  const [job, setJob] = React.useState(location.state?.job || undefined);
-  const [expandedRows, setExpandedRows] = React.useState({});
-
-  const [openModal, setOpenModal] = React.useState(false);
-  const [files, setFiles] = React.useState([]);
-  const [selectedJob, setSelectedJob] = React.useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [selectedJob, setSelectedJob] = useState("");
   const { businessId } = useAuth();
+
+  // Filter states
+  const [nameFilter, setNameFilter] = useState("");
+  const [jobIdFilter, setJobIdFilter] = useState("");
+  const [emailFilter, setEmailFilter] = useState("");
+  const [compatibilityFilter, setCompatibilityFilter] = useState("all");
+  const [filteredApplicants, setFilteredApplicants] = useState([]);
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -102,6 +123,94 @@ const Applicants = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Function to find job name by ID
+  const getJobNameById = (jobId) => {
+    const job = job_openings.find(job => job.id === jobId);
+    return job ? job.title : "Unknown Job";
+  };
+
+  // Apply filters whenever filter criteria change
+  useEffect(() => {
+    applyFilters();
+  }, [nameFilter, jobIdFilter, emailFilter, compatibilityFilter, applicants, job]);
+
+  // Apply all filters
+  const applyFilters = () => {
+    let result = [...applicants];
+
+    // If we have a specific job selected, filter by that job first
+    if (job !== undefined) {
+      result = result.filter(app => app.job_opening_id === String(job.id));
+    }
+
+    // Filter by name
+    if (nameFilter) {
+      result = result.filter(applicant => 
+        applicant.name && applicant.name.toLowerCase().includes(nameFilter.toLowerCase())
+      );
+    }
+
+    // Filter by job ID or job name
+    if (jobIdFilter) {
+      result = result.filter(applicant => {
+        // Check if job ID includes the search term
+        const jobIdMatch = applicant.job_opening_id && 
+                          applicant.job_opening_id.includes(jobIdFilter);
+        
+        // Check if job name includes the search term
+        const jobName = getJobNameById(applicant.job_opening_id);
+        const jobNameMatch = jobName && 
+                            jobName.toLowerCase().includes(jobIdFilter.toLowerCase());
+        
+        // Return true if either matches
+        return jobIdMatch || jobNameMatch;
+      });
+    }
+
+    // Filter by email
+    if (emailFilter) {
+      result = result.filter(applicant => 
+        applicant.email && applicant.email.toLowerCase().includes(emailFilter.toLowerCase())
+      );
+    }
+
+    // Filter by compatibility
+    if (compatibilityFilter !== "all") {
+      if (compatibilityFilter === "processing") {
+        // Filter for applicants still in processing
+        result = result.filter(applicant => applicant.compatibility === -1.1);
+      } else {
+        // Parse the range from the string value (e.g., "0-25" becomes [0, 25])
+        const [min, max] = compatibilityFilter.split("-").map(Number);
+        
+        result = result.filter(applicant => {
+          // Skip applicants still processing if we're looking for a specific range
+          if (applicant.compatibility === -1.1) return false;
+          
+          const compatPercent = Math.floor(applicant.compatibility * 100);
+          return compatPercent >= min && compatPercent <= max;
+        });
+      }
+    }
+
+    setFilteredApplicants(result);
+  };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setNameFilter("");
+    setJobIdFilter("");
+    setEmailFilter("");
+    setCompatibilityFilter("all");
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = 
+    nameFilter !== "" || 
+    jobIdFilter !== "" || 
+    emailFilter !== "" || 
+    compatibilityFilter !== "all";
+
   // Fetch applicants when component mounts
   useEffect(() => {
     const formatApplicants = (applicants) => {
@@ -126,6 +235,7 @@ const Applicants = () => {
         const dataApplicants = formatApplicants(data);
         console.log("Applicants", dataApplicants);
         setApplicants(dataApplicants);
+        setFilteredApplicants(dataApplicants);
         setError(null);
       } catch (err) {
         console.error("Failed to fetch applicants:", err);
@@ -151,17 +261,23 @@ const Applicants = () => {
 
     fetchApplicants();
     fetchJobOpenings();
-  }, [businessId, job]); // Re-fetch if businessId changes
+  }, [businessId]); // Re-fetch if businessId changes
 
   const deleteApplicant = async (index) => {
-    const applicant = applicants[index];
-    try {
-      const response = await deleteApplicantAPI(applicant.id);
-      if (response) {
-        setApplicants(applicants.filter((_, i) => i !== index));
+    const applicant = filteredApplicants[index];
+    const applicantIndex = applicants.findIndex(app => app.id === applicant.id);
+    
+    if (applicantIndex !== -1) {
+      try {
+        const response = await deleteApplicantAPI(applicant.id);
+        if (response) {
+          const updatedApplicants = [...applicants];
+          updatedApplicants.splice(applicantIndex, 1);
+          setApplicants(updatedApplicants);
+        }
+      } catch (error) {
+        console.error("Failed to delete applicant:", error);
       }
-    } catch (error) {
-      console.error("Failed to delete applicant:", error);
     }
   };
 
@@ -235,14 +351,14 @@ const Applicants = () => {
         <Typography variant="h1" gutterBottom color="primary.main">
           Applicants
         </Typography>
-        <Paper>
+        <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
           <Box
-            p={2}
             display="flex"
             justifyContent="space-between"
             alignItems="center"
+            mb={3}
           >
-            <Typography variant="h5" gutterBottom color="black">
+            <Typography variant="h5" color="black">
               {job === undefined ? (
                 "All Applicants"
               ) : (
@@ -266,6 +382,110 @@ const Applicants = () => {
             </Button>
           </Box>
 
+          {/* Filter Section */}
+          <Box sx={{ mb: 3 }}>
+            <Box display="flex" alignItems="center" mb={2}>
+              <FilterIcon color="primary" sx={{ mr: 1 }} />
+              <Typography variant="h6">Filters</Typography>
+              <Box flexGrow={1} />
+              <Button 
+                size="small" 
+                startIcon={<ClearIcon />} 
+                onClick={resetFilters}
+                disabled={!hasActiveFilters}
+              >
+                Clear Filters
+              </Button>
+            </Box>
+            
+            <Grid container spacing={2}>
+              {/* Name Filter */}
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  label="Search by Name"
+                  variant="outlined"
+                  value={nameFilter}
+                  onChange={(e) => setNameFilter(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              
+              {/* Job ID Filter */}
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  label="Search by Job ID/Name"
+                  variant="outlined"
+                  value={jobIdFilter}
+                  onChange={(e) => setJobIdFilter(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              
+              {/* Email Filter */}
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  label="Search by Email"
+                  variant="outlined"
+                  value={emailFilter}
+                  onChange={(e) => setEmailFilter(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              
+              {/* Compatibility Filter */}
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth>
+                  <InputLabel id="compatibility-filter-label">Compatibility</InputLabel>
+                  <Select
+                    labelId="compatibility-filter-label"
+                    id="compatibility-filter"
+                    value={compatibilityFilter}
+                    label="Compatibility"
+                    onChange={(e) => setCompatibilityFilter(e.target.value)}
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    <MenuItem value="processing">Processing</MenuItem>
+                    <MenuItem value="0-25">0-25%</MenuItem>
+                    <MenuItem value="26-50">26-50%</MenuItem>
+                    <MenuItem value="51-75">51-75%</MenuItem>
+                    <MenuItem value="76-100">76-100%</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+            
+            {/* Results count */}
+            <Box mt={2} display="flex" justifyContent="flex-end">
+              <Typography variant="body2" color="text.secondary">
+                Showing {filteredApplicants.length} of {applicants.length} applicants
+                {job !== undefined ? " for this job" : ""}
+              </Typography>
+            </Box>
+            
+            <Divider sx={{ mt: 3 }} />
+          </Box>
+
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -277,7 +497,7 @@ const Applicants = () => {
                     <Typography variant="h6">Name</Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="h6">Job ID</Typography>
+                    <Typography variant="h6">Job</Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="h6">Compatibility</Typography>
@@ -291,97 +511,95 @@ const Applicants = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {applicants.length === 0 && !loading ? (
+                {filteredApplicants.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} align="center">
                       <Typography variant="body1">
-                        No applicants found
+                        {loading ? "Loading applicants..." : "No applicants found matching your filters"}
                       </Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  applicants.map((applicant, index) => {
-                    if (
-                      job === undefined ||
-                      applicant.job_opening_id === String(job.id)
-                    ) {
-                      return (
-                        <React.Fragment key={index}>
-                          <TableRow>
-                            <TableCell>
-                              <IconButton onClick={() => viewApplicant(index)}>
-                                {expandedRows[index] ? (
-                                  <ExpandLessIcon />
-                                ) : (
-                                  <ExpandMoreIcon />
-                                )}
-                              </IconButton>
-                            </TableCell>
-                            <TableCell>{applicant.name}</TableCell>
-                            <TableCell>{applicant.job_opening_id.substring(0, 8)}</TableCell>
-                            <TableCell>
-                              {applicant.compatibility === -1.1
-                                ? "Processing..."
-                                : `${Math.floor(applicant.compatibility * 100)}%`}
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                color="primary"
-                                onClick={() =>
-                                  downloadResume(
-                                    applicant.id,
-                                    applicant.name,
-                                    applicant.job_opening_id
-                                  )
-                                }
-                              >
-                                <DownloadIcon />
-                              </Button>
-                            </TableCell>
+                  filteredApplicants.map((applicant, index) => (
+                    <React.Fragment key={index}>
+                      <TableRow>
+                        <TableCell>
+                          <IconButton onClick={() => viewApplicant(index)}>
+                            {expandedRows[index] ? (
+                              <ExpandLessIcon />
+                            ) : (
+                              <ExpandMoreIcon />
+                            )}
+                          </IconButton>
+                        </TableCell>
+                        <TableCell>{applicant.name}</TableCell>
+                        <TableCell>
+                          <Box>
+                            <Typography variant="body2" color="text.secondary">
+                              {applicant.job_opening_id.substring(0, 8)} - {getJobNameById(applicant.job_opening_id)}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          {applicant.compatibility === -1.1
+                            ? "Processing..."
+                            : `${Math.floor(applicant.compatibility * 100)}%`}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            color="primary"
+                            onClick={() =>
+                              downloadResume(
+                                applicant.id,
+                                applicant.name,
+                                applicant.job_opening_id
+                              )
+                            }
+                          >
+                            <DownloadIcon />
+                          </Button>
+                        </TableCell>
 
-                            <TableCell>
-                              <Button
-                                color="secondary"
-                                onClick={() => deleteApplicant(index)}
-                              >
-                                <DeleteIcon />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
+                        <TableCell>
+                          <Button
+                            color="secondary"
+                            onClick={() => deleteApplicant(index)}
+                          >
+                            <DeleteIcon />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
 
-                          {/* Expandable Row with More Details */}
-                          <TableRow>
-                            <TableCell
-                              colSpan={7}
-                              style={{ paddingBottom: 0, paddingTop: 0 }}
-                            >
-                              <Collapse
-                                in={expandedRows[index]}
-                                timeout="auto"
-                                unmountOnExit
-                              >
-                                <Box margin={2}>
-                                  <Typography variant="body1">
-                                    <Box
-                                      display="flex"
-                                      justifyContent="space-between"
-                                      alignItems="center"
-                                    >
-                                      <Box>
-                                        <strong>Email:</strong>{" "}
-                                        {applicant.email}
-                                      </Box>
-                                    </Box>
-                                  </Typography>
+                      {/* Expandable Row with More Details */}
+                      <TableRow>
+                        <TableCell
+                          colSpan={7}
+                          style={{ paddingBottom: 0, paddingTop: 0 }}
+                        >
+                          <Collapse
+                            in={expandedRows[index]}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <Box margin={2}>
+                              <Typography variant="body1">
+                                <Box
+                                  display="flex"
+                                  justifyContent="space-between"
+                                  alignItems="center"
+                                >
+                                  <Box>
+                                    <strong>Email:</strong>{" "}
+                                    {applicant.email}
+                                  </Box>
                                 </Box>
-                              </Collapse>
-                            </TableCell>
-                          </TableRow>
-                        </React.Fragment>
-                      );
-                    }
-                    return null;
-                  })
+                              </Typography>
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  ))
                 )}
               </TableBody>
             </Table>

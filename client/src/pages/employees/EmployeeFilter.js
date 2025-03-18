@@ -8,9 +8,17 @@ import {
   Grid,
   Box,
   Typography,
+  Button,
+  InputAdornment,
+  Divider,
 } from "@mui/material";
+import {
+  FilterList as FilterIcon,
+  Search as SearchIcon,
+  Clear as ClearIcon,
+} from "@mui/icons-material";
 
-const EmployeeFilter = ({ filters, setFilters, departments, levels }) => {
+const EmployeeFilter = ({ filters, setFilters, departments, levels, filteredCount, totalCount }) => {
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({
@@ -19,49 +27,91 @@ const EmployeeFilter = ({ filters, setFilters, departments, levels }) => {
     }));
   };
 
+  // Reset all filters
+  const resetFilters = () => {
+    setFilters({
+      name: "",
+      id: "",
+      department: "",
+      position_level: "",
+    });
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = 
+    filters.name !== "" || 
+    filters.id !== "" || 
+    filters.department !== "" || 
+    filters.position_level !== "";
+
   return (
-    <>
-      <Typography variant="h5" gutterBottom color="black">
-        Filters
-      </Typography>
+    <Box sx={{ mb: 3 }}>
+      <Box display="flex" alignItems="center" mb={2}>
+        <FilterIcon color="primary" sx={{ mr: 1 }} />
+        <Typography variant="h6">Filters</Typography>
+        <Box flexGrow={1} />
+        <Button 
+          size="small" 
+          startIcon={<ClearIcon />} 
+          onClick={resetFilters}
+          disabled={!hasActiveFilters}
+        >
+          Clear Filters
+        </Button>
+      </Box>
+      
+      <Grid container spacing={2}>
+        {/* ID Filter */}
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            label="Search by ID"
+            variant="outlined"
+            name="id"
+            value={filters.id}
+            fullWidth
+            onChange={handleFilterChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
 
-      <Box sx={{ mb: 2 }}>
-        <Grid container spacing={2}>
-          {/* ID Filter */}
-          <Grid item xs={12} sm={3}>
-            <TextField
-              label="Employee ID"
-              variant="outlined"
-              name="id"
-              value={filters.id}
-              fullWidth
-              onChange={handleFilterChange}
-            />
-          </Grid>
+        {/* Name Filter */}
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            label="Search by Name"
+            variant="outlined"
+            name="name"
+            value={filters.name}
+            fullWidth
+            onChange={handleFilterChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
 
-          {/* Name Filter */}
-          <Grid item xs={12} sm={3}>
-            <TextField
-              label="Name"
-              variant="outlined"
-              name="name"
-              value={filters.name}
-              fullWidth
-              onChange={handleFilterChange}
-            />
-          </Grid>
-
-          {/* Department Filter */}
-          <Grid item xs={12} sm={3}>
+        {/* Department Filter */}
+        <Grid item xs={12} sm={6} md={3}>
+          <FormControl fullWidth>
+            <InputLabel id="department-filter-label">Department</InputLabel>
             <Select
-              displayEmpty
+              labelId="department-filter-label"
               name="department"
               value={filters.department}
-              fullWidth
+              label="Department"
               onChange={handleFilterChange}
             >
-              <MenuItem value="" disabled>
-                Department
+              <MenuItem value="">
+                <em>All Departments</em>
               </MenuItem>
               {departments.map((dept) => (
                 <MenuItem key={dept} value={dept}>
@@ -69,19 +119,22 @@ const EmployeeFilter = ({ filters, setFilters, departments, levels }) => {
                 </MenuItem>
               ))}
             </Select>
-          </Grid>
+          </FormControl>
+        </Grid>
 
-          {/* Level Filter */}
-          <Grid item xs={12} sm={3}>
+        {/* Level Filter */}
+        <Grid item xs={12} sm={6} md={3}>
+          <FormControl fullWidth>
+            <InputLabel id="level-filter-label">Level</InputLabel>
             <Select
-              displayEmpty
+              labelId="level-filter-label"
               name="position_level"
               value={filters.position_level}
-              fullWidth
+              label="Level"
               onChange={handleFilterChange}
             >
-              <MenuItem value="" disabled>
-                Level
+              <MenuItem value="">
+                <em>All Levels</em>
               </MenuItem>
               {levels.map((level) => (
                 <MenuItem key={level} value={level}>
@@ -89,10 +142,19 @@ const EmployeeFilter = ({ filters, setFilters, departments, levels }) => {
                 </MenuItem>
               ))}
             </Select>
-          </Grid>
+          </FormControl>
         </Grid>
+      </Grid>
+      
+      {/* Results count */}
+      <Box mt={2} display="flex" justifyContent="flex-end">
+        <Typography variant="body2" color="text.secondary">
+          Showing {filteredCount || 0} of {totalCount || 0} employees
+        </Typography>
       </Box>
-    </>
+      
+      <Divider sx={{ mt: 3 }} />
+    </Box>
   );
 };
 

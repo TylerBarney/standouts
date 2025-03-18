@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Paper,
@@ -28,9 +28,9 @@ import EmployeeFilter from "./EmployeeFilter";
 import { useAuth } from "../authentication/AuthContext";
 
 const Employees = () => {
-  const [employees, setEmployees] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [filters, setFilters] = useState({
     name: "",
@@ -39,6 +39,8 @@ const Employees = () => {
     position_level: "",
   });
 
+  const { businessId } = useAuth();
+  
   // Extract unique department and level options from employees
   const departments = [...new Set(employees.map((e) => e.department))];
   const levels = [...new Set(employees.map((e) => e.position_level))];
@@ -56,9 +58,7 @@ const Employees = () => {
     );
   });
 
-  const { businessId } = useAuth();
-
-  React.useEffect(() => {
+  useEffect(() => {
     const formatEmployees = (employees) => {
       return employees.map((employee) => {
         return {
@@ -88,10 +88,10 @@ const Employees = () => {
     fetchEmployees();
   }, [businessId]);
 
-  const [openModal, setOpenModal] = React.useState(false);
-  const [files, setFiles] = React.useState([]);
-  const [selectedLevel, setSelectedLevel] = React.useState("");
-  const [selectedDepartment, setSelectedDepartment] = React.useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [selectedLevel, setSelectedLevel] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -152,12 +152,18 @@ const Employees = () => {
   };
 
   const deleteResume = async (index) => {
-    const employee = employees[index];
-    const response = await deleteEmployeeAPI(employee.id);
-    if (response) {
-      setEmployees(employees.filter((_, i) => i !== index));
-    } else {
-      console.log("Employee not deleted");
+    const employee = filteredEmployees[index];
+    const employeeIndex = employees.findIndex(emp => emp.id === employee.id);
+    
+    if (employeeIndex !== -1) {
+      const response = await deleteEmployeeAPI(employee.id);
+      if (response) {
+        const updatedEmployees = [...employees];
+        updatedEmployees.splice(employeeIndex, 1);
+        setEmployees(updatedEmployees);
+      } else {
+        console.log("Employee not deleted");
+      }
     }
   };
 
@@ -208,22 +214,8 @@ const Employees = () => {
         />
 
         <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
-          {/* Employee Filter Section */}
-          <EmployeeFilter
-            filters={filters}
-            setFilters={setFilters}
-            departments={departments}
-            levels={levels}
-          />
-
-          <Box
-            pt={2}
-            pb={2}
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h5" gutterBottom color="black">
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+            <Typography variant="h5" color="black">
               Resumes
             </Typography>
 
@@ -237,6 +229,16 @@ const Employees = () => {
               Upload Resumes
             </Button>
           </Box>
+
+          {/* Employee Filter Section */}
+          <EmployeeFilter
+            filters={filters}
+            setFilters={setFilters}
+            departments={departments}
+            levels={levels}
+            filteredCount={filteredEmployees.length}
+            totalCount={employees.length}
+          />
 
           <TableContainer component={Paper}>
             <Table>
@@ -258,22 +260,22 @@ const Employees = () => {
                     <Typography variant="h6">Resume</Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="h6">Remove</Typography>
+                    <Typography variant="h6">Delete</Typography>
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {employees.length === 0 && !loading ? (
+                {filteredEmployees.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} align="center">
+                    <TableCell colSpan={6} align="center">
                       <Typography variant="body1">
-                        No employees found
+                        {loading ? "Loading employees..." : "No employees found matching your filters"}
                       </Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  employees.map((employee, index) => (
-                    <TableRow>
+                  filteredEmployees.map((employee, index) => (
+                    <TableRow key={index}>
                       <TableCell>{employee.id.substring(0, 8)}</TableCell>
                       <TableCell>{employee.name}</TableCell>
                       <TableCell>{employee.department}</TableCell>
@@ -288,7 +290,6 @@ const Employees = () => {
                           <DownloadIcon />
                         </Button>
                       </TableCell>
-
                       <TableCell>
                         <Button
                           color="secondary"
