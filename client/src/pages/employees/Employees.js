@@ -217,7 +217,8 @@ const Employees = () => {
           />
 
           <Box
-            p={2}
+            pt={2}
+            pb={2}
             display="flex"
             justifyContent="space-between"
             alignItems="center"

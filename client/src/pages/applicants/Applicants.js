@@ -74,7 +74,7 @@ const Applicants = () => {
       // Simulated data (normally, this comes from the backend)
       const applicant = {
         job_opening_id: selectedJob.id,
-        compatibility: 0.8,
+        compatibility: -1.1,
         business_id: businessId,
         resume_pdf: file,
         department_id: selectedJob.department_id,
@@ -320,7 +320,9 @@ const Applicants = () => {
                             <TableCell>{applicant.name}</TableCell>
                             <TableCell>{applicant.job_opening_id.substring(0, 8)}</TableCell>
                             <TableCell>
-                              {Math.floor(applicant.compatibility * 100)}%
+                              {applicant.compatibility === -1.1
+                                ? "Processing..."
+                                : `${Math.floor(applicant.compatibility * 100)}%`}
                             </TableCell>
                             <TableCell>
                               <Button
