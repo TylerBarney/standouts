@@ -28,22 +28,22 @@ import { AuthProvider, useAuth } from "./pages/authentication/AuthContext";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#1976d2",
-      light: "#42a5f5",
-      dark: "#0d47a1",
+      main: "#074F57",
+      light: "#077187",
+      dark: "#053D42",
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#f50057",
+      main: "#74A57F",
       contrastText: "#ffffff",
     },
     background: {
-      default: "#f5f5f5",
-      paper: "#ffffff",
+      default: "#F9F6F2",
+      paper: "#ffffff", 
     },
     text: {
       primary: "#212121",
-      secondary: "#757575",
+      secondary: "#4A4A4A",
     },
   },
   typography: {

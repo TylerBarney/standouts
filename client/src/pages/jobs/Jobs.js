@@ -13,12 +13,15 @@ import {
   TableRow,
   Button,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import {
   PeopleAlt as ApplicantsIcon,
   Delete as DeleteIcon,
+  DescriptionOutlined as DescriptionIcon,
 } from "@mui/icons-material";
 import AddJob from "./AddJob";
+import DescriptionModal from "./DescriptionModal";
 import {
   getJobOpenings,
   addJobOpening,
@@ -34,6 +37,10 @@ const Jobs = () => {
   const [error, setError] = useState(null);
 
   const { businessId } = useAuth();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
+  const [selectedDescription, setSelectedDescription] = useState("");
+  const [selectedJobTitle, setSelectedJobTitle] = useState("");
 
   useEffect(() => {
     const formatJobs = (jobs) => {
@@ -109,6 +116,20 @@ const Jobs = () => {
     }
   };
 
+  // Open description modal
+  const openDescriptionModal = (description, title) => {
+    setSelectedDescription(description);
+    setSelectedJobTitle(title);
+    setDescriptionModalOpen(true);
+  };
+
+  // Function to truncate text
+  const truncateText = (text, maxLength = 40) => {
+    if (!text) return "";
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 8 }}>
@@ -116,11 +137,34 @@ const Jobs = () => {
           Job Openings
         </Typography>
         <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
-          <AddJob newJob={newJob} addJob={addJob} setNewJob={setNewJob} />
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+            <Typography variant="h5" color="black">
+              View Current Jobs
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setModalOpen(true)}
+            >
+              Add Job
+            </Button>
+          </Box>
+          <AddJob
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+            newJob={newJob}
+            addJob={addJob}
+            setNewJob={setNewJob}
+          />
 
-          <Typography variant="h5" gutterBottom color="black">
-            View Current Jobs
-          </Typography>
+          {/* Description Modal */}
+          <DescriptionModal 
+            open={descriptionModalOpen}
+            onClose={() => setDescriptionModalOpen(false)}
+            title={selectedJobTitle}
+            description={selectedDescription}
+          />
+
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -160,7 +204,26 @@ const Jobs = () => {
                     <TableRow key={index}>
                       <TableCell>{job.id.substring(0, 8)}</TableCell>
                       <TableCell>{job.title}</TableCell>
-                      <TableCell>{job.description}</TableCell>
+                      <TableCell>
+                        <Box 
+                          sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              color: 'primary.main',
+                            }
+                          }}
+                          onClick={() => openDescriptionModal(job.description, job.title)}
+                        >
+                          <Tooltip title="Click to view full description">
+                            <Typography variant="body2" sx={{ mr: 1 }}>
+                              {truncateText(job.description, 20)}
+                            </Typography>
+                          </Tooltip>
+                          <DescriptionIcon fontSize="small" color="action" />
+                        </Box>
+                      </TableCell>
                       <TableCell>{job.department_id}</TableCell>
                       <TableCell>{job.position_level}</TableCell>
                       <TableCell>

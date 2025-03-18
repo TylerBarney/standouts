@@ -39,7 +39,7 @@ const Dashboard = () => {
                 Employee Resumes
               </Typography>
               <Typography variant="body1" paragraph color="text.secondary">
-                Information about what the employee resumes do/are
+                Enter current employee resumes to test the compatibility with potential future candidates 
               </Typography>
               <Grid container spacing={2} sx={{ mt: 3 }}>
                 <Grid item>
@@ -69,8 +69,7 @@ const Dashboard = () => {
                 Applicant Resumes
               </Typography>
               <Typography variant="body1" paragraph color="text.secondary">
-                Information about what the applicant resumes do/are and how the
-                compatilibites are scored.
+                Enter applicant resumes to test the compatibility with current employees
               </Typography>
               <Grid container spacing={2} sx={{ mt: 3 }}>
                 <Grid item>
@@ -100,7 +99,7 @@ const Dashboard = () => {
                 Job Openings
               </Typography>
               <Typography variant="body1" paragraph color="text.secondary">
-                Information about how the job openings work
+                Enter current job openings for your company
               </Typography>
               <Grid container spacing={2} sx={{ mt: 3 }}>
                 <Grid item>

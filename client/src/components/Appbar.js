@@ -15,7 +15,7 @@ const Appbar = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ backgroundColor: "theme.palette.primary.dark" }}>
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           {companyName ? `Welcome, ${companyName}` : "Welcome"}
