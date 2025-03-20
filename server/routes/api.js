@@ -85,12 +85,19 @@ router.get(
   controller.getBusinessInfoByEmail
 );
 
-// API to send uploaded resumes via email
+// API to send employee uploaded resumes via email
 router.post(
-  "/email-resumes",
+  "/email-employee-resumes",
   authMiddleware,
   upload.array("resumes"),
-  controller.emailResumes
+  controller.emailEmployeeResumes
+);
+
+router.post(
+  "/email-applicant-resumes",
+  authMiddleware,
+  upload.array("resumes"),
+  controller.emailApplicantResumes
 );
 
 // You can add more routes or import from other route files here

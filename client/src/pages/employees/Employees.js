@@ -22,7 +22,7 @@ import {
   addEmployeeAPI,
   deleteEmployeeAPI,
   downloadEmployeeResume,
-  sendUploadedResumes,
+  sendUploadedEmployeeResumes,
 } from "../../services/api";
 import UploadResumeModal from "./UploadResumeModal";
 import EmployeeFilter from "./EmployeeFilter";
@@ -117,14 +117,14 @@ const Employees = () => {
     }
   };
 
-  const sendResumesToSelf = async () => {
+  const emailEmployeeResumesToSelf = async () => {
     if (files.length === 0) {
       console.log("No resumes imported, no email sent.");
       return;
     }
 
     try {
-      await sendUploadedResumes(
+      await sendUploadedEmployeeResumes(
         files,
         selectedDepartment,
         selectedLevel,
@@ -151,7 +151,7 @@ const Employees = () => {
     });
 
     // Send email with the employee resume information
-    sendResumesToSelf();
+    emailEmployeeResumesToSelf();
 
     // Wait for all uploads to complete
     await Promise.all(uploadPromises);

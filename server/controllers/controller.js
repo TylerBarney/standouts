@@ -273,7 +273,7 @@ exports.deleteApplicant = async (req, res) => {
   }
 };
 
-exports.emailResumes = async (req, res) => {
+exports.emailEmployeeResumes = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "No files uploaded" });
@@ -287,15 +287,52 @@ exports.emailResumes = async (req, res) => {
       content: file.buffer,
     }));
 
-    const emailHeader = `Business ID: ${businessId} New Employee Resumes`;
+    const emailHeader = `New Employee Resumes`;
 
     // Email Body
-    const emailBody = `
+    const emailBody = `Aubry, Chloey, and Tyler,\n
       Business ID: ${businessId}
       Level: ${level}
       Department: ${department}
       \n\nAttached are the new employee resumes that were uploaded by the business. Use them to compare with corresponding applicants.
       \n\nThank you,\nStandout
+    `;
+
+    // Send email
+    await sendEmail(emailHeader, emailBody, attachments);
+
+    res.json({ message: "Email sent with uploaded resumes!" });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ message: "Failed to send email" });
+  }
+};
+
+exports.emailApplicantResumes = async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No files uploaded" });
+    }
+
+    const { jobId, level, department, businessId } = req.body;
+
+    // Convert uploaded files into attachments
+    const attachments = req.files.map((file) => ({
+      filename: file.originalname,
+      content: file.buffer,
+    }));
+
+    const emailHeader = `New Applicants For Job ID: ${jobId}`;
+
+    // Email Body
+    const emailBody = `Aubry, Chloey, and Tyler,\n
+      Business ID: ${businessId}
+      Job ID: ${jobId}
+      Level: ${level}
+      Department: ${department}
+      \n\nAnalyze the compatibilty for these new applicants.
+      \nTo calculate compatibility, compare the applicant resumes with the employee resumes from the same department and level.
+      \n\nThanks,\nStandout
     `;
 
     // Send email

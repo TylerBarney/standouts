@@ -219,7 +219,7 @@ export const downloadEmployeeResume = async (employeeId) => {
   }
 };
 
-export const sendUploadedResumes = async (
+export const sendUploadedEmployeeResumes = async (
   files,
   department,
   level,
@@ -234,7 +234,37 @@ export const sendUploadedResumes = async (
     formData.append("department", department);
     formData.append("businessId", businessId);
 
-    const response = await api.post("/email-resumes", formData, {
+    const response = await api.post("/email-employee-resumes", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error sending uploaded resumes:", error);
+    throw error;
+  }
+};
+
+export const sendUploadedApplicantResumes = async (
+  files,
+  jobId,
+  department,
+  level,
+  businessId
+) => {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("resumes", file);
+    });
+    formData.append("jobId", jobId);
+    formData.append("level", level);
+    formData.append("department", department);
+    formData.append("businessId", businessId);
+
+    const response = await api.post("/email-applicant-resumes", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

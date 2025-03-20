@@ -21,7 +21,7 @@ const sendEmail = async (subject, text, attachments) => {
   try {
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: "ahiatt191@gmail.com, ahiatt19@byu.edu", // Sending to yourself
+      to: process.env.FOUNDER_EMAILS, // Sending to founders
       subject,
       text,
       attachments,

@@ -44,12 +44,12 @@ import {
   addApplicantAPI,
   deleteApplicantAPI,
   downloadApplicantResume,
+  sendUploadedApplicantResumes,
 } from "../../services/api";
 import { useAuth } from "../authentication/AuthContext";
 
 const Applicants = () => {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const [job_openings, setJobOpenings] = useState([]);
   const [job, setJob] = useState(location.state?.job || undefined);
@@ -89,6 +89,26 @@ const Applicants = () => {
     }
   };
 
+  const emailApplicantResumesToSelf = async () => {
+    if (files.length === 0) {
+      console.log("No resumes imported, no email sent.");
+      return;
+    }
+
+    try {
+      await sendUploadedApplicantResumes(
+        files,
+        selectedJob.id,
+        selectedJob.department_id,
+        selectedJob.position_level,
+        businessId
+      );
+      alert("Email sent with uploaded resumes!");
+    } catch (error) {
+      alert("Failed to send email.");
+    }
+  };
+
   const handleUploadResumes = () => {
     // make the API call to upload the files to the database
     files.forEach((file, index) => {
@@ -105,6 +125,9 @@ const Applicants = () => {
       // Add the applicant to the frontend
       addApplicant(applicant);
     });
+
+    // Send email with the applicant resumes
+    emailApplicantResumesToSelf();
 
     console.log("Uploading files...", files);
     setOpenModal(false); //Close modal after upload
@@ -125,14 +148,21 @@ const Applicants = () => {
 
   // Function to find job name by ID
   const getJobNameById = (jobId) => {
-    const job = job_openings.find(job => job.id === jobId);
+    const job = job_openings.find((job) => job.id === jobId);
     return job ? job.title : "Unknown Job";
   };
 
   // Apply filters whenever filter criteria change
   useEffect(() => {
     applyFilters();
-  }, [nameFilter, jobIdFilter, emailFilter, compatibilityFilter, applicants, job]);
+  }, [
+    nameFilter,
+    jobIdFilter,
+    emailFilter,
+    compatibilityFilter,
+    applicants,
+    job,
+  ]);
 
   // Apply all filters
   const applyFilters = () => {
@@ -140,28 +170,31 @@ const Applicants = () => {
 
     // If we have a specific job selected, filter by that job first
     if (job !== undefined) {
-      result = result.filter(app => app.job_opening_id === String(job.id));
+      result = result.filter((app) => app.job_opening_id === String(job.id));
     }
 
     // Filter by name
     if (nameFilter) {
-      result = result.filter(applicant => 
-        applicant.name && applicant.name.toLowerCase().includes(nameFilter.toLowerCase())
+      result = result.filter(
+        (applicant) =>
+          applicant.name &&
+          applicant.name.toLowerCase().includes(nameFilter.toLowerCase())
       );
     }
 
     // Filter by job ID or job name
     if (jobIdFilter) {
-      result = result.filter(applicant => {
+      result = result.filter((applicant) => {
         // Check if job ID includes the search term
-        const jobIdMatch = applicant.job_opening_id && 
-                          applicant.job_opening_id.includes(jobIdFilter);
-        
+        const jobIdMatch =
+          applicant.job_opening_id &&
+          applicant.job_opening_id.includes(jobIdFilter);
+
         // Check if job name includes the search term
         const jobName = getJobNameById(applicant.job_opening_id);
-        const jobNameMatch = jobName && 
-                            jobName.toLowerCase().includes(jobIdFilter.toLowerCase());
-        
+        const jobNameMatch =
+          jobName && jobName.toLowerCase().includes(jobIdFilter.toLowerCase());
+
         // Return true if either matches
         return jobIdMatch || jobNameMatch;
       });
@@ -169,8 +202,10 @@ const Applicants = () => {
 
     // Filter by email
     if (emailFilter) {
-      result = result.filter(applicant => 
-        applicant.email && applicant.email.toLowerCase().includes(emailFilter.toLowerCase())
+      result = result.filter(
+        (applicant) =>
+          applicant.email &&
+          applicant.email.toLowerCase().includes(emailFilter.toLowerCase())
       );
     }
 
@@ -178,15 +213,15 @@ const Applicants = () => {
     if (compatibilityFilter !== "all") {
       if (compatibilityFilter === "processing") {
         // Filter for applicants still in processing
-        result = result.filter(applicant => applicant.compatibility === -1.1);
+        result = result.filter((applicant) => applicant.compatibility === -1.1);
       } else {
         // Parse the range from the string value (e.g., "0-25" becomes [0, 25])
         const [min, max] = compatibilityFilter.split("-").map(Number);
-        
-        result = result.filter(applicant => {
+
+        result = result.filter((applicant) => {
           // Skip applicants still processing if we're looking for a specific range
           if (applicant.compatibility === -1.1) return false;
-          
+
           const compatPercent = Math.floor(applicant.compatibility * 100);
           return compatPercent >= min && compatPercent <= max;
         });
@@ -205,10 +240,10 @@ const Applicants = () => {
   };
 
   // Check if any filters are active
-  const hasActiveFilters = 
-    nameFilter !== "" || 
-    jobIdFilter !== "" || 
-    emailFilter !== "" || 
+  const hasActiveFilters =
+    nameFilter !== "" ||
+    jobIdFilter !== "" ||
+    emailFilter !== "" ||
     compatibilityFilter !== "all";
 
   // Fetch applicants when component mounts
@@ -265,8 +300,10 @@ const Applicants = () => {
 
   const deleteApplicant = async (index) => {
     const applicant = filteredApplicants[index];
-    const applicantIndex = applicants.findIndex(app => app.id === applicant.id);
-    
+    const applicantIndex = applicants.findIndex(
+      (app) => app.id === applicant.id
+    );
+
     if (applicantIndex !== -1) {
       try {
         const response = await deleteApplicantAPI(applicant.id);
@@ -388,16 +425,16 @@ const Applicants = () => {
               <FilterIcon color="primary" sx={{ mr: 1 }} />
               <Typography variant="h6">Filters</Typography>
               <Box flexGrow={1} />
-              <Button 
-                size="small" 
-                startIcon={<ClearIcon />} 
+              <Button
+                size="small"
+                startIcon={<ClearIcon />}
                 onClick={resetFilters}
                 disabled={!hasActiveFilters}
               >
                 Clear Filters
               </Button>
             </Box>
-            
+
             <Grid container spacing={2}>
               {/* Name Filter */}
               <Grid item xs={12} sm={6} md={3}>
@@ -416,7 +453,7 @@ const Applicants = () => {
                   }}
                 />
               </Grid>
-              
+
               {/* Job ID Filter */}
               <Grid item xs={12} sm={6} md={3}>
                 <TextField
@@ -434,7 +471,7 @@ const Applicants = () => {
                   }}
                 />
               </Grid>
-              
+
               {/* Email Filter */}
               <Grid item xs={12} sm={6} md={3}>
                 <TextField
@@ -452,11 +489,13 @@ const Applicants = () => {
                   }}
                 />
               </Grid>
-              
+
               {/* Compatibility Filter */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth>
-                  <InputLabel id="compatibility-filter-label">Compatibility</InputLabel>
+                  <InputLabel id="compatibility-filter-label">
+                    Compatibility
+                  </InputLabel>
                   <Select
                     labelId="compatibility-filter-label"
                     id="compatibility-filter"
@@ -474,15 +513,16 @@ const Applicants = () => {
                 </FormControl>
               </Grid>
             </Grid>
-            
+
             {/* Results count */}
             <Box mt={2} display="flex" justifyContent="flex-end">
               <Typography variant="body2" color="text.secondary">
-                Showing {filteredApplicants.length} of {applicants.length} applicants
+                Showing {filteredApplicants.length} of {applicants.length}{" "}
+                applicants
                 {job !== undefined ? " for this job" : ""}
               </Typography>
             </Box>
-            
+
             <Divider sx={{ mt: 3 }} />
           </Box>
 
@@ -515,7 +555,9 @@ const Applicants = () => {
                   <TableRow>
                     <TableCell colSpan={7} align="center">
                       <Typography variant="body1">
-                        {loading ? "Loading applicants..." : "No applicants found matching your filters"}
+                        {loading
+                          ? "Loading applicants..."
+                          : "No applicants found matching your filters"}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -536,7 +578,8 @@ const Applicants = () => {
                         <TableCell>
                           <Box>
                             <Typography variant="body2" color="text.secondary">
-                              {applicant.job_opening_id.substring(0, 8)} - {getJobNameById(applicant.job_opening_id)}
+                              {applicant.job_opening_id.substring(0, 8)} -{" "}
+                              {getJobNameById(applicant.job_opening_id)}
                             </Typography>
                           </Box>
                         </TableCell>
@@ -589,8 +632,7 @@ const Applicants = () => {
                                   alignItems="center"
                                 >
                                   <Box>
-                                    <strong>Email:</strong>{" "}
-                                    {applicant.email}
+                                    <strong>Email:</strong> {applicant.email}
                                   </Box>
                                 </Box>
                               </Typography>
