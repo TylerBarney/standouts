@@ -22,6 +22,7 @@ import {
   addEmployeeAPI,
   deleteEmployeeAPI,
   downloadEmployeeResume,
+  sendUploadedResumes,
 } from "../../services/api";
 import UploadResumeModal from "./UploadResumeModal";
 import EmployeeFilter from "./EmployeeFilter";
@@ -40,7 +41,7 @@ const Employees = () => {
   });
 
   const { businessId } = useAuth();
-  
+
   // Extract unique department and level options from employees
   const departments = [...new Set(employees.map((e) => e.department))];
   const levels = [...new Set(employees.map((e) => e.position_level))];
@@ -116,6 +117,25 @@ const Employees = () => {
     }
   };
 
+  const sendResumesToSelf = async () => {
+    if (files.length === 0) {
+      console.log("No resumes imported, no email sent.");
+      return;
+    }
+
+    try {
+      await sendUploadedResumes(
+        files,
+        selectedDepartment,
+        selectedLevel,
+        businessId
+      );
+      alert("Email sent with uploaded resumes!");
+    } catch (error) {
+      alert("Failed to send email.");
+    }
+  };
+
   const handleUploadResumes = async () => {
     // make the API call to upload the files to the database
     const uploadPromises = files.map((file) => {
@@ -129,6 +149,9 @@ const Employees = () => {
       // Add the resume to the frontend and return the promise
       return addEmployee(resume);
     });
+
+    // Send email with the employee resume information
+    sendResumesToSelf();
 
     // Wait for all uploads to complete
     await Promise.all(uploadPromises);
@@ -153,8 +176,8 @@ const Employees = () => {
 
   const deleteResume = async (index) => {
     const employee = filteredEmployees[index];
-    const employeeIndex = employees.findIndex(emp => emp.id === employee.id);
-    
+    const employeeIndex = employees.findIndex((emp) => emp.id === employee.id);
+
     if (employeeIndex !== -1) {
       const response = await deleteEmployeeAPI(employee.id);
       if (response) {
@@ -214,7 +237,12 @@ const Employees = () => {
         />
 
         <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={3}
+          >
             <Typography variant="h5" color="black">
               Resumes
             </Typography>
@@ -269,7 +297,9 @@ const Employees = () => {
                   <TableRow>
                     <TableCell colSpan={6} align="center">
                       <Typography variant="body1">
-                        {loading ? "Loading employees..." : "No employees found matching your filters"}
+                        {loading
+                          ? "Loading employees..."
+                          : "No employees found matching your filters"}
                       </Typography>
                     </TableCell>
                   </TableRow>

@@ -11,7 +11,11 @@ const {
   Applicant,
 } = require("../models/models.js");
 const logger = require("../utils/logger");
-const { extractNameFromResume, extractEmailFromResume } = require("../utils/pdfParser");
+const {
+  extractNameFromResume,
+  extractEmailFromResume,
+} = require("../utils/pdfParser");
+const sendEmail = require("../utils/sendEmail");
 
 // Controller methods
 exports.getBusinessInfo = async (req, res) => {
@@ -64,9 +68,8 @@ exports.getEmployees = async (req, res) => {
 
 exports.addEmployee = async (req, res) => {
   try {
-    const { business_id, department, position_level } =
-      req.body;
-    
+    const { business_id, department, position_level } = req.body;
+
     if (!req.file) {
       return res.status(400).json({ error: "Resume PDF is required" });
     }
@@ -112,17 +115,19 @@ exports.deleteEmployee = async (req, res) => {
 
 exports.downloadEmployeeResume = async (req, res) => {
   try {
-    console.log(req.params.employeeId)
+    console.log(req.params.employeeId);
     const employee = await Employee.findById(req.params.employeeId);
-    res.setHeader('Content-Type', 'employee/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${employee.resume_pdf_filename}"`);
+    res.setHeader("Content-Type", "employee/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${employee.resume_pdf_filename}"`
+    );
     res.send(employee.resume_pdf);
   } catch (error) {
-    logger.error('Error downloading employee resume', error);
-    res.status(500).json({ error: 'Server error' });
+    logger.error("Error downloading employee resume", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
-
 
 // Job Openings
 exports.getJobOpenings = async (req, res) => {
@@ -153,28 +158,32 @@ exports.addJobOpening = async (req, res) => {
     const savedJobOpening = await newJobOpening.save();
     res.status(201).json(savedJobOpening);
   } catch (error) {
-    logger.error('Error adding job opening', error);
+    logger.error("Error adding job opening", error);
     res.status(500).json({ error: "Server error" });
   }
 };
 
 exports.deleteJobOpening = async (req, res) => {
   try {
-    const jobOpening = await JobOpening.findByIdAndDelete(req.params.jobOpeningId);
+    const jobOpening = await JobOpening.findByIdAndDelete(
+      req.params.jobOpeningId
+    );
     res.status(200).json(jobOpening);
   } catch (error) {
-    logger.error('Error deleting job opening', error);
-    res.status(500).json({ error: 'Server error' });
+    logger.error("Error deleting job opening", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
 exports.deleteJobOpening = async (req, res) => {
   try {
-    const jobOpening = await JobOpening.findByIdAndDelete(req.params.jobOpeningId);
+    const jobOpening = await JobOpening.findByIdAndDelete(
+      req.params.jobOpeningId
+    );
     res.status(200).json(jobOpening);
   } catch (error) {
-    logger.error('Error deleting job opening', error);
-    res.status(500).json({ error: 'Server error' });
+    logger.error("Error deleting job opening", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -184,7 +193,7 @@ exports.getApplicants = async (req, res) => {
     const applicants = await Applicant.find({
       business_id: req.params.businessId,
     });
-    
+
     res.json(applicants);
   } catch (error) {
     logger.error("Error fetching applicants", error);
@@ -194,7 +203,13 @@ exports.getApplicants = async (req, res) => {
 
 exports.addApplicant = async (req, res) => {
   try {
-    const { business_id, job_opening_id, department_id, position_level, compatibility } = req.body;
+    const {
+      business_id,
+      job_opening_id,
+      department_id,
+      position_level,
+      compatibility,
+    } = req.body;
     if (!req.file) {
       return res.status(400).json({ error: "Resume PDF is required" });
     }
@@ -216,7 +231,7 @@ exports.addApplicant = async (req, res) => {
       resume_pdf_filename,
       department_id,
       position_level,
-      compatibility: compatibility || 0
+      compatibility: compatibility || 0,
     });
 
     const savedApplicant = await newApplicant.save();
@@ -236,12 +251,15 @@ exports.addApplicant = async (req, res) => {
 exports.downloadApplicantResume = async (req, res) => {
   try {
     const applicant = await Applicant.findById(req.params.applicantId);
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${applicant.resume_pdf_filename}"`);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${applicant.resume_pdf_filename}"`
+    );
     res.send(applicant.resume_pdf);
   } catch (error) {
-    logger.error('Error downloading applicant resume', error);
-    res.status(500).json({ error: 'Server error' });
+    logger.error("Error downloading applicant resume", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -250,9 +268,44 @@ exports.deleteApplicant = async (req, res) => {
     const applicant = await Applicant.findByIdAndDelete(req.params.applicantId);
     res.status(200).json(applicant);
   } catch (error) {
-    logger.error('Error deleting applicant', error);
-    res.status(500).json({ error: 'Server error' });
+    logger.error("Error deleting applicant", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
-// Add more controller methods as needed 
+
+exports.emailResumes = async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No files uploaded" });
+    }
+
+    const { level, department, businessId } = req.body;
+
+    // Convert uploaded files into attachments
+    const attachments = req.files.map((file) => ({
+      filename: file.originalname,
+      content: file.buffer,
+    }));
+
+    const emailHeader = `Business ID: ${businessId} New Employee Resumes`;
+
+    // Email Body
+    const emailBody = `
+      Business ID: ${businessId}
+      Level: ${level}
+      Department: ${department}
+      \n\nAttached are the new employee resumes that were uploaded by the business. Use them to compare with corresponding applicants.
+      \n\nThank you,\nStandout
+    `;
+
+    // Send email
+    await sendEmail(emailHeader, emailBody, attachments);
+
+    res.json({ message: "Email sent with uploaded resumes!" });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ message: "Failed to send email" });
+  }
+};
+// Add more controller methods as needed
 // Add more controller methods as needed
