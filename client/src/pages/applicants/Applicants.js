@@ -44,6 +44,7 @@ import {
   addApplicantAPI,
   deleteApplicantAPI,
   downloadApplicantResume,
+  sendUploadedApplicantResumes,
   addApplicantsBatchAPI,
 } from "../../services/api";
 import { useAuth } from "../authentication/AuthContext";
@@ -90,6 +91,26 @@ const Applicants = () => {
     }
   };
 
+  const emailApplicantResumesToSelf = async () => {
+    if (files.length === 0) {
+      console.log("No resumes imported, no email sent.");
+      return;
+    }
+
+    try {
+      await sendUploadedApplicantResumes(
+        files,
+        selectedJob.id,
+        selectedJob.department_id,
+        selectedJob.position_level,
+        businessId
+      );
+      alert("Email sent with uploaded resumes!");
+    } catch (error) {
+      alert("Failed to send email.");
+    }
+  };
+
   const handleUploadResumes = async () => {
     // make the API call to upload the files to the database
     const applicantsData = files.map((file, index) => {
@@ -107,6 +128,8 @@ const Applicants = () => {
       const response = await addApplicantsBatchAPI(applicantsData);
       console.log("Applicants added in batch:", response);
       setApplicants([...applicants, ...response]);
+      // Send email with the applicant resumes
+      emailApplicantResumesToSelf();
     } catch (error) {
       console.error("Failed to add applicants in batch:", error);
     }
