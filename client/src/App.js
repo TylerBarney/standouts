@@ -10,6 +10,7 @@ import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 // Components
 import Navbar from "./components/Navbar";
 import Appbar from "./components/Appbar";
+import ConnectionTest from "./ConnectionTest";
 
 // Authentication
 import Login from "./pages/authentication/Login";
@@ -124,6 +125,7 @@ function AppContext() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/test-connection" element={<ConnectionTest />} />
 
             <Route path="/" element={<Navigate to="/login" replace />} />
 
