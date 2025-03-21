@@ -44,6 +44,7 @@ import {
   addApplicantAPI,
   deleteApplicantAPI,
   downloadApplicantResume,
+  addApplicantsBatchAPI,
 } from "../../services/api";
 import { useAuth } from "../authentication/AuthContext";
 
@@ -89,22 +90,26 @@ const Applicants = () => {
     }
   };
 
-  const handleUploadResumes = () => {
+  const handleUploadResumes = async () => {
     // make the API call to upload the files to the database
-    files.forEach((file, index) => {
-      // Simulated data (normally, this comes from the backend)
-      const applicant = {
+    const applicantsData = files.map((file, index) => {
+      return {
         job_opening_id: selectedJob.id,
         compatibility: -1.1,
         business_id: businessId,
         resume_pdf: file,
         department_id: selectedJob.department_id,
         position_level: selectedJob.position_level,
-      };
+      }
+    })
 
-      // Add the applicant to the frontend
-      addApplicant(applicant);
-    });
+    try {
+      const response = await addApplicantsBatchAPI(applicantsData);
+      console.log("Applicants added in batch:", response);
+      setApplicants([...applicants, ...response]);
+    } catch (error) {
+      console.error("Failed to add applicants in batch:", error);
+    }
 
     console.log("Uploading files...", files);
     setOpenModal(false); //Close modal after upload

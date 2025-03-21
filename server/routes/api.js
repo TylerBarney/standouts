@@ -38,6 +38,7 @@ router.post('/job-openings', authMiddleware, controller.addJobOpening);
 router.delete('/job-openings/:jobOpeningId', authMiddleware, controller.deleteJobOpening);
 
 router.get('/business/:businessId/applicants', authMiddleware, controller.getApplicants);
+router.post('/applicants/batch', authMiddleware, upload.array('resume_pdfs', 20), controller.addApplicantsBatch);
 router.post('/applicants', authMiddleware, upload.single('resume_pdf'), controller.addApplicant);
 router.delete('/applicants/:applicantId', authMiddleware, controller.deleteApplicant);
 router.get('/applicants/:applicantId/resume', authMiddleware, controller.downloadApplicantResume);

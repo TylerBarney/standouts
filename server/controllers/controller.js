@@ -233,6 +233,49 @@ exports.addApplicant = async (req, res) => {
   }
 };
 
+exports.addApplicantsBatch = async (req, res) => {
+  try {
+    const applicantsMetadata = JSON.parse(req.body.applicants_metadata);
+    const resume_pdfs = req.files;
+
+    const results = []
+    for (let i = 0; i < applicantsMetadata.length; i++) {
+      const applicantMetadata = applicantsMetadata[i];
+      const resume_pdf = resume_pdfs[i].buffer;
+
+      if (!resume_pdf) {
+        logger.error(`Resume PDF is missing for applicant ${i}`);
+        continue;
+      }
+
+      const name = await extractNameFromResume(resume_pdf);
+      const email = await extractEmailFromResume(resume_pdf);
+
+      const applicant = new Applicant({
+        name,
+        email,
+        ...applicantMetadata,
+        resume_pdf,
+        resume_pdf_filename: name + "_Resume.pdf",
+      });
+
+      const savedApplicant = await applicant.save();
+
+      // Don't return the resume_pdf or resume_pdf_filename in the response
+      const responseApplicant = savedApplicant.toObject();
+      delete responseApplicant.resume_pdf;
+      delete responseApplicant.resume_pdf_filename;
+
+      results.push(responseApplicant);
+    }
+
+    res.status(201).json(results);
+  } catch (error) {
+    logger.error("Error adding applicants batch", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 exports.downloadApplicantResume = async (req, res) => {
   try {
     const applicant = await Applicant.findById(req.params.applicantId);
