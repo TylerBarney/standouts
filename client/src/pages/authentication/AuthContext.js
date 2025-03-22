@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
         loading,
       }}
     >
-      {!loading && children} {/* Prevent rendering until loading is done */}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

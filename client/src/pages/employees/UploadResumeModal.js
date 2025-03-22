@@ -149,10 +149,10 @@ const UploadResumeModal = ({
                     variant="body2"
                     style={{
                       flexGrow: 1,
-                      overflow: "hidden", // Ensure content doesn't overflow
-                      textOverflow: "ellipsis", // Apply ellipsis when text overflows
-                      whiteSpace: "nowrap", // Prevent wrapping
-                      display: "block", // Make sure it behaves like a block-level element for wrapping
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      display: "block",
                       width: "100%",
                     }}
                   >

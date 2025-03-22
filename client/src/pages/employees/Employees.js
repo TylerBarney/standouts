@@ -99,7 +99,6 @@ const Employees = () => {
     setFiles(selectedFiles);
   };
 
-  //Remove file from import
   const removeFile = (index) => {
     setFiles(files.filter((_, i) => i !== index));
   };
@@ -146,22 +145,18 @@ const Employees = () => {
         business_id: businessId,
       };
 
-      // Add the resume to the frontend and return the promise
       return addEmployee(resume);
     });
 
     // Send email with the employee resume information
     emailEmployeeResumesToSelf();
 
-    // Wait for all uploads to complete
     await Promise.all(uploadPromises);
 
     console.log("Uploading files...", files);
-    setOpenModal(false); //Close modal after upload
+    setOpenModal(false);
 
-    // Clear the files after upload
     setFiles([]);
-    // Clear selected level and department
     setSelectedDepartment("");
     setSelectedLevel("");
   };

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/controller");
-const authMiddleware = require("../middleware/auth");
 
 const multer = require("multer");
 const storage = multer.memoryStorage();
@@ -16,96 +15,58 @@ router.get("/test", (req, res) => {
 });
 
 // Routes
-router.get(
-  "/business/:businessId/info",
-  authMiddleware,
-  controller.getBusinessInfo
-);
-router.post("/business", authMiddleware, controller.addBusiness);
+router.get("/business/:businessId/info", controller.getBusinessInfo);
+router.post("/business", controller.addBusiness);
 
-router.get(
-  "/business/:businessId/employees",
-  authMiddleware,
-  controller.getEmployees
-);
-router.post(
-  "/employees",
-  authMiddleware,
-  upload.single("resume_pdf"),
-  controller.addEmployee
-);
-router.delete(
-  "/employees/:employeeId",
-  authMiddleware,
-  controller.deleteEmployee
-);
-router.get(
-  "/employees/:employeeId/resume",
-  authMiddleware,
-  controller.downloadEmployeeResume
-);
+router.get("/business/:businessId/employees", controller.getEmployees);
+router.post("/employees", upload.single("resume_pdf"), controller.addEmployee);
+router.delete("/employees/:employeeId", controller.deleteEmployee);
+router.get("/employees/:employeeId/resume", controller.downloadEmployeeResume);
 
-router.get(
-  "/business/:businessId/job-openings",
-  authMiddleware,
-  controller.getJobOpenings
-);
-router.post("/job-openings", authMiddleware, controller.addJobOpening);
-router.delete(
-  "/job-openings/:jobOpeningId",
-  authMiddleware,
-  controller.deleteJobOpening
-);
+router.get("/business/:businessId/job-openings", controller.getJobOpenings);
+router.post("/job-openings", controller.addJobOpening);
+router.delete("/job-openings/:jobOpeningId", controller.deleteJobOpening);
 
-router.get(
-  "/business/:businessId/applicants",
-  authMiddleware,
-  controller.getApplicants
-);
+router.get("/business/:businessId/applicants", controller.getApplicants);
 router.post(
   "/applicants",
-  authMiddleware,
   upload.single("resume_pdf"),
   controller.addApplicant
 );
-router.delete(
-  "/applicants/:applicantId",
-  authMiddleware,
-  controller.deleteApplicant
-);
+router.delete("/applicants/:applicantId", controller.deleteApplicant);
 router.get(
   "/applicants/:applicantId/resume",
-  authMiddleware,
   controller.downloadApplicantResume
 );
-router.get('/business/:businessId/applicants', authMiddleware, controller.getApplicants);
-router.post('/applicants/batch', authMiddleware, upload.array('resume_pdfs', 20), controller.addApplicantsBatch);
-router.post('/applicants', authMiddleware, upload.single('resume_pdf'), controller.addApplicant);
-router.delete('/applicants/:applicantId', authMiddleware, controller.deleteApplicant);
-router.get('/applicants/:applicantId/resume', authMiddleware, controller.downloadApplicantResume);
-
+router.get("/business/:businessId/applicants", controller.getApplicants);
+router.post(
+  "/applicants/batch",
+  upload.array("resume_pdfs", 20),
+  controller.addApplicantsBatch
+);
+router.post(
+  "/applicants",
+  upload.single("resume_pdf"),
+  controller.addApplicant
+);
+router.delete("/applicants/:applicantId", controller.deleteApplicant);
 router.get(
-  "/business/info/:email",
-  authMiddleware,
-  controller.getBusinessInfoByEmail
+  "/applicants/:applicantId/resume",
+  controller.downloadApplicantResume
 );
 
-// API to send employee uploaded resumes via email
+router.get("/business/info/:email", controller.getBusinessInfoByEmail);
+
 router.post(
   "/email-employee-resumes",
-  authMiddleware,
   upload.array("resumes"),
   controller.emailEmployeeResumes
 );
 
 router.post(
   "/email-applicant-resumes",
-  authMiddleware,
   upload.array("resumes"),
   controller.emailApplicantResumes
 );
-
-// You can add more routes or import from other route files here
-// Example: router.use('/products', require('./productRoutes'));
 
 module.exports = router;

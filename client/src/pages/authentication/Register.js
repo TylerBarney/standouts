@@ -34,7 +34,7 @@ const Register = () => {
       password: password,
     };
 
-    /* CHECK IF EMAIL ALREADY EXISTS IN DATABASE */
+    /* NEED TO CHECK IF EMAIL ALREADY EXISTS IN DATABASE */
 
     try {
       // Call API to add business

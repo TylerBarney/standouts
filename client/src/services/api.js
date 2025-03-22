@@ -2,13 +2,12 @@ import axios from "axios";
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "https://Standout-test-env.eba-dbh5zyxe.us-east-1.elasticbeanstalk.com/api",
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5001/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Example API methods
 export const testApi = async () => {
   try {
     const response = await api.get("/test");
@@ -19,7 +18,6 @@ export const testApi = async () => {
   }
 };
 
-// Add more API methods as needed
 export const getBusinessInfo = async (businessId) => {
   try {
     const response = await api.get(`/business/${businessId}/info`);
@@ -93,7 +91,6 @@ export const getApplicants = async (businessId) => {
 export const addApplicantAPI = async (applicantData) => {
   console.log("Adding applicant:", applicantData);
   try {
-    // Create a FormData object for file uploads
     const formData = new FormData();
 
     // Check if the resume_pdf is actually a File object
@@ -134,28 +131,33 @@ export const addApplicantsBatchAPI = async (applicantsData) => {
     // Create a FormData object for file uploads
     const formData = new FormData();
 
-    const applicantsMetadata = []
+    const applicantsMetadata = [];
 
     // For each applicant in the batch
     applicantsData.forEach((applicantData, index) => {
       // Check if the resume_pdf is actually a File object
       if (!(applicantData.resume_pdf instanceof File)) {
-        console.error(`resume_pdf for applicant ${index} is not a File object:`, applicantData.resume_pdf);
-        throw new Error(`resume_pdf for applicant ${index} must be a File object`);
+        console.error(
+          `resume_pdf for applicant ${index} is not a File object:`,
+          applicantData.resume_pdf
+        );
+        throw new Error(
+          `resume_pdf for applicant ${index} must be a File object`
+        );
       }
 
-      formData.append('resume_pdfs', applicantData.resume_pdf);
+      formData.append("resume_pdfs", applicantData.resume_pdf);
 
-      const metadata = { ...applicantData }
-      delete metadata.resume_pdf
-      applicantsMetadata.push(metadata)
+      const metadata = { ...applicantData };
+      delete metadata.resume_pdf;
+      applicantsMetadata.push(metadata);
     });
 
-    formData.append('applicants_metadata', JSON.stringify(applicantsMetadata));
+    formData.append("applicants_metadata", JSON.stringify(applicantsMetadata));
 
     const response = await api.post("/applicants/batch", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data;
@@ -164,8 +166,6 @@ export const addApplicantsBatchAPI = async (applicantsData) => {
     throw error;
   }
 };
-
-
 
 export const deleteApplicantAPI = async (applicantId) => {
   try {

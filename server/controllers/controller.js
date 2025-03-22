@@ -253,7 +253,7 @@ exports.addApplicantsBatch = async (req, res) => {
     const applicantsMetadata = JSON.parse(req.body.applicants_metadata);
     const resume_pdfs = req.files;
 
-    const results = []
+    const results = [];
     for (let i = 0; i < applicantsMetadata.length; i++) {
       const applicantMetadata = applicantsMetadata[i];
       const resume_pdf = resume_pdfs[i].buffer;
@@ -316,6 +316,7 @@ exports.deleteApplicant = async (req, res) => {
   }
 };
 
+// Employees
 exports.emailEmployeeResumes = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -387,5 +388,3 @@ exports.emailApplicantResumes = async (req, res) => {
     res.status(500).json({ message: "Failed to send email" });
   }
 };
-// Add more controller methods as needed
-// Add more controller methods as needed

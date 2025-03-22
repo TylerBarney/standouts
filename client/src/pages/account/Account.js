@@ -10,8 +10,6 @@ const Account = () => {
   const [newCompanyName, setNewCompanyName] = useState(companyName);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [currentPassword, setCurrentPassword] = useState(""); // To store the current password
-  const [editedPassword, setEditedPassword] = useState(""); // For editing password
 
   const [isEditingUsername, setIsEditingUsername] = useState(false); // Toggle edit mode for username
   const [editedUsername, setEditedUsername] = useState(username);

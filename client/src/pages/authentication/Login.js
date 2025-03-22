@@ -27,12 +27,10 @@ const Login = () => {
       return;
     }
 
-    // Simulate a login process (e.g., call API)
-    // You can replace the below logic with actual authentication logic
     try {
       const { _id, name, password } = await getBusinessInfoByEmail(inputEmail);
 
-      if (inputPassword != password) {
+      if (inputPassword !== password) {
         setError("Invalid inputEmail or inputPassword");
         return;
       }

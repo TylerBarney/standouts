@@ -39,13 +39,11 @@ const Navbar = () => {
   // Determine drawer width based on open state and screen size
   const drawerWidth = isMobile ? 70 : open ? 240 : 70;
 
-  // List of navigation items
   const navItems = [
     { text: "Dashboard", path: "/dashboard", icon: <HomeIcon /> },
     { text: "Jobs", path: "/jobs", icon: <WorkIcon /> },
     { text: "Applicants", path: "/applicants", icon: <ApplicantsIcon /> },
     { text: "Employees", path: "/employees", icon: <EmployeeIcon /> },
-    // Add more navigation items as needed
   ];
 
   return (
@@ -159,15 +157,15 @@ const Navbar = () => {
                   {item.icon}
                 </ListItemIcon>
                 {open && (
-                  <ListItemText 
-                    primary={item.text} 
-                    sx={{ 
-                      '& .MuiListItemText-primary': { 
-                        color: 
+                  <ListItemText
+                    primary={item.text}
+                    sx={{
+                      "& .MuiListItemText-primary": {
+                        color:
                           location.pathname === item.path
-                          ? theme.palette.secondary.main
-                          : theme.palette.primary.contrastText, 
-                      } 
+                            ? theme.palette.secondary.main
+                            : theme.palette.primary.contrastText,
+                      },
                     }}
                   />
                 )}
