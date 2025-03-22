@@ -79,9 +79,9 @@ const Applicants = () => {
         selectedJob.position_level,
         businessId
       );
-      alert("Email sent with uploaded resumes!");
+      console.log("Email sent with uploaded resumes!");
     } catch (error) {
-      alert("Failed to send email.");
+      console.log("Failed to send email.");
     }
   };
 
