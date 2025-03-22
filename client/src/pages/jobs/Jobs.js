@@ -31,7 +31,7 @@ import {
   FilterList as FilterIcon,
   Clear as ClearIcon,
 } from "@mui/icons-material";
-import AddJob from "./AddJob";
+import AddJobModal from "./AddJob";
 import DescriptionModal from "./DescriptionModal";
 import {
   getJobOpenings,
@@ -61,7 +61,15 @@ const Jobs = () => {
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
 
   // List of unique departments and levels for filters
-  const departments = ["Engineering", "Marketing", "HR", "Sales", "Finance", "BI", "Internship"];
+  const departments = [
+    "Engineering",
+    "Marketing",
+    "HR",
+    "Sales",
+    "Finance",
+    "BI",
+    "Internship",
+  ];
   const levels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
 
   useEffect(() => {
@@ -73,7 +81,7 @@ const Jobs = () => {
           description: job.description,
           department_id: job.department_id,
           position_level: job.position_level,
-          business_id: job.business_id,
+          business_id: job.business_id._id,
         };
       });
     };
@@ -118,30 +126,24 @@ const Jobs = () => {
 
     // Filter by search term (title)
     if (searchTerm) {
-      result = result.filter(job => 
+      result = result.filter((job) =>
         job.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by ID
     if (idFilter) {
-      result = result.filter(job => 
-        job.id.includes(idFilter)
-      );
+      result = result.filter((job) => job.id.includes(idFilter));
     }
 
     // Filter by department
     if (departmentFilter) {
-      result = result.filter(job => 
-        job.department_id === departmentFilter
-      );
+      result = result.filter((job) => job.department_id === departmentFilter);
     }
 
     // Filter by level
     if (levelFilter) {
-      result = result.filter(job => 
-        job.position_level === levelFilter
-      );
+      result = result.filter((job) => job.position_level === levelFilter);
     }
 
     setFilteredJobs(result);
@@ -179,8 +181,8 @@ const Jobs = () => {
   // This will need to delete the job from the database
   const deleteJob = async (index) => {
     const jobToDelete = filteredJobs[index];
-    const jobIndex = jobs.findIndex(job => job.id === jobToDelete.id);
-    
+    const jobIndex = jobs.findIndex((job) => job.id === jobToDelete.id);
+
     if (jobIndex !== -1) {
       const response = await deleteJobOpening(jobToDelete.id);
       if (response) {
@@ -214,7 +216,12 @@ const Jobs = () => {
           Job Openings
         </Typography>
         <Paper elevation={2} sx={{ mt: 5, p: 4, borderRadius: 2 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={3}
+          >
             <Typography variant="h5" color="black">
               View Current Jobs
             </Typography>
@@ -226,23 +233,25 @@ const Jobs = () => {
               Add Job
             </Button>
           </Box>
-          
+
           {/* Filter Section */}
           <Box sx={{ mb: 3 }}>
             <Box display="flex" alignItems="center" mb={2}>
               <FilterIcon color="primary" sx={{ mr: 1 }} />
               <Typography variant="h6">Filters</Typography>
               <Box flexGrow={1} />
-              <Button 
-                size="small" 
-                startIcon={<ClearIcon />} 
+              <Button
+                size="small"
+                startIcon={<ClearIcon />}
                 onClick={resetFilters}
-                disabled={!searchTerm && !idFilter && !departmentFilter && !levelFilter}
+                disabled={
+                  !searchTerm && !idFilter && !departmentFilter && !levelFilter
+                }
               >
                 Clear Filters
               </Button>
             </Box>
-            
+
             <Grid container spacing={2}>
               {/* Search by title */}
               <Grid item xs={12} sm={6} md={3}>
@@ -261,7 +270,7 @@ const Jobs = () => {
                   }}
                 />
               </Grid>
-              
+
               {/* Search by ID */}
               <Grid item xs={12} sm={6} md={3}>
                 <TextField
@@ -279,11 +288,13 @@ const Jobs = () => {
                   }}
                 />
               </Grid>
-              
+
               {/* Filter by department */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth>
-                  <InputLabel id="department-filter-label">Department</InputLabel>
+                  <InputLabel id="department-filter-label">
+                    Department
+                  </InputLabel>
                   <Select
                     labelId="department-filter-label"
                     value={departmentFilter}
@@ -301,7 +312,7 @@ const Jobs = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              
+
               {/* Filter by level */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth>
@@ -324,18 +335,18 @@ const Jobs = () => {
                 </FormControl>
               </Grid>
             </Grid>
-            
+
             {/* Results count */}
             <Box mt={2} display="flex" justifyContent="flex-end">
               <Typography variant="body2" color="text.secondary">
                 Showing {filteredJobs.length} of {jobs.length} jobs
               </Typography>
             </Box>
-            
+
             <Divider sx={{ mt: 3 }} />
           </Box>
 
-          <AddJob
+          <AddJobModal
             open={modalOpen}
             onClose={() => setModalOpen(false)}
             newJob={newJob}
@@ -344,7 +355,7 @@ const Jobs = () => {
           />
 
           {/* Description Modal */}
-          <DescriptionModal 
+          <DescriptionModal
             open={descriptionModalOpen}
             onClose={() => setDescriptionModalOpen(false)}
             title={selectedJobTitle}
@@ -383,7 +394,9 @@ const Jobs = () => {
                   <TableRow>
                     <TableCell colSpan={7} align="center">
                       <Typography variant="body1">
-                        {loading ? "Loading jobs..." : "No jobs found matching your filters"}
+                        {loading
+                          ? "Loading jobs..."
+                          : "No jobs found matching your filters"}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -393,16 +406,18 @@ const Jobs = () => {
                       <TableCell>{job.id.substring(0, 8)}</TableCell>
                       <TableCell>{job.title}</TableCell>
                       <TableCell>
-                        <Box 
-                          sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center',
-                            cursor: 'pointer',
-                            '&:hover': {
-                              color: 'primary.main',
-                            }
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            cursor: "pointer",
+                            "&:hover": {
+                              color: "primary.main",
+                            },
                           }}
-                          onClick={() => openDescriptionModal(job.description, job.title)}
+                          onClick={() =>
+                            openDescriptionModal(job.description, job.title)
+                          }
                         >
                           <Tooltip title="Click to view full description">
                             <Typography variant="body2" sx={{ mr: 1 }}>

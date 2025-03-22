@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-const AddJob = ({ open, onClose, newJob, addJob, setNewJob }) => {
+const AddJobModal = ({ open, onClose, newJob, addJob, setNewJob }) => {
   const jobLevels = ["Manager", "Senior", "Junior", "Entry", "Internship"];
   const jobDepartments = [
     "Engineering",
@@ -31,12 +31,12 @@ const AddJob = ({ open, onClose, newJob, addJob, setNewJob }) => {
 
   // Modal style
   const modalStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 600,
-    bgcolor: 'background.paper',
+    bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
     borderRadius: 2,
@@ -45,7 +45,12 @@ const AddJob = ({ open, onClose, newJob, addJob, setNewJob }) => {
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={modalStyle}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
           <Typography variant="h5" color="black">
             Add a New Job
           </Typography>
@@ -64,7 +69,9 @@ const AddJob = ({ open, onClose, newJob, addJob, setNewJob }) => {
                 variant="outlined"
                 value={newJob.title}
                 fullWidth
-                onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
+                onChange={(e) =>
+                  setNewJob({ ...newJob, title: e.target.value })
+                }
               />
             </Grid>
 
@@ -126,16 +133,20 @@ const AddJob = ({ open, onClose, newJob, addJob, setNewJob }) => {
               </Select>
             </Grid>
 
-            <Grid item xs={12} sx={{ textAlign: 'right' }}>
-              <Button 
-                variant="outlined" 
-                color="secondary" 
-                onClick={onClose} 
+            <Grid item xs={12} sx={{ textAlign: "right" }}>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={onClose}
                 sx={{ mr: 1 }}
               >
                 Cancel
               </Button>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+              >
                 Add
               </Button>
             </Grid>
@@ -146,4 +157,4 @@ const AddJob = ({ open, onClose, newJob, addJob, setNewJob }) => {
   );
 };
 
-export default AddJob;
+export default AddJobModal;

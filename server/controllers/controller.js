@@ -175,18 +175,6 @@ exports.deleteJobOpening = async (req, res) => {
   }
 };
 
-exports.deleteJobOpening = async (req, res) => {
-  try {
-    const jobOpening = await JobOpening.findByIdAndDelete(
-      req.params.jobOpeningId
-    );
-    res.status(200).json(jobOpening);
-  } catch (error) {
-    logger.error("Error deleting job opening", error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
 // Applicants
 exports.getApplicants = async (req, res) => {
   try {

@@ -43,7 +43,7 @@ const Register = () => {
       const localHostData = {
         email,
         companyName,
-        businessID,
+        businessId: businessID,
       };
       login(localHostData);
       navigate("/dashboard");
